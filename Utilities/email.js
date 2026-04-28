@@ -34,7 +34,7 @@ formatJson = JSON.stringify(users, null, 2);
 
 const systemTempDir1 = os.tmpdir();
 const myAppDir1 = path.join(systemTempDir1, 'MyApp', 'Logs');
-const filePath2 = path.join(myAppDir1, 'merged-logs.html');
+const filePath2 = path.join(myAppDir1, 'merged-logs_1.html');
 const foldableJsonHtml = fs.readFileSync(filePath2, 'utf8');
 
 

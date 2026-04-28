@@ -203,27 +203,6 @@ showLog = data.SHOW_LOG;
             //   allLogs_all = Array.isArray(allLogs) ? allLogs.concat(allLogs) : allLogs;
             allLogs_all.push(allLogs);
 
-            //    console.log('start-----------------------------------------');
-            //    console.log(JSON.stringify(allLogs_all, null, 2));
-            /*
-                        if (showLog === 'simple') {
-                          allLogs = allLogs.concat(user1[0]);
-                        } else {
-                          allLogs = allLogs.concat(user1);
-                        }
-            
-                        if (showLog === 'failed' || showLog === 'simple') {  //show details if the case is failed
-                          if (final === '---------------------------------------(Failed)') {
-                            allLogs = allLogs.concat(user1);
-                          } else {
-                            allLogs = allLogs.concat(user1[0]);
-                          }
-                        }
-                        else {
-                          allLogs = allLogs.concat(user1);
-                        }
-            */
-
           } catch (readErr) {
             console.error(`concatenate error 1: `, readErr);
           }
@@ -347,7 +326,7 @@ console.log('Result:' + title)
 
         const systemTempDir1 = os.tmpdir();
         const myAppDir1 = path.join(systemTempDir1, 'MyApp', 'Logs');
-        const filePath1 = path.join(myAppDir1, 'merged-logs.html');
+        const filePath1 = path.join(myAppDir1, 'merged-logs_1.html');
         console.log('Output Folder: ' + filePath1 );
 
         //targetDir = myAppDir;
