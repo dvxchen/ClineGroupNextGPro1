@@ -17,10 +17,7 @@ REM Run the daily test runner
 
 node backup.js
 
-git stash
 git pull
-
-git stash pop
 
 cd ..
 node main.js
