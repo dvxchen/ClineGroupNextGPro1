@@ -319,14 +319,13 @@ async function run() {
 
   const browser = await puppeteer.launch({
     headless: false, // so you can see the actions
-    devtools: needDevtools,
+    devtools: false, // 禁用右侧DevTools调试栏
     defaultViewport: null,
     args: needDevtools
       ? [
         '--start-maximized',
         '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--auto-open-devtools-for-tabs'
+        '--disable-setuid-sandbox'
       ]
       : [
         '--no-sandbox',

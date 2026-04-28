@@ -26,7 +26,7 @@ const fs = require('fs');
 (async () => {
   const browser = await chromium.launch({
     headless: false,
-    devtools: true, // 打开 DevTools，满足“chrome-devtools打开”的要求
+    devtools: false, // 禁用右侧DevTools调试栏
     slowMo: 50,
     args: [
     '--start-maximized',   // 启动就最大化
