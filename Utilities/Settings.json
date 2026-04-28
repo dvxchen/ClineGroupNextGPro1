@@ -3,6 +3,6 @@
     "SHOW_LOG_ALL": "all,simple,failed",
     "EMAIL_TO": "davy.chen+1@sap.com",
     "EMAIL_ENABLE": "false",
-    "SCHEDULE": "21:00",
+    "SCHEDULE": "22:30",
     "HEADLESS": "true"
 }
