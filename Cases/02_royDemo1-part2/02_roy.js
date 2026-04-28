@@ -23,16 +23,27 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 
+function strToBool(val) {
+  // 先转小写，兼容 True / FALSE / True
+  const s = String(val).trim().toLowerCase();
+  return s === 'true';
+}
+
 (async () => {
+
+  const path = require('path');
+  const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
+  const headlessFlag = data.HEADLESS;
+
   const browser = await chromium.launch({
-    headless: false,
-    devtools: false, // 禁用右侧DevTools调试栏
+    headless: strToBool(headlessFlag),
+    devtools: false, // 
     slowMo: 50,
     args: [
-    '--start-maximized',   // 启动就最大化
-    '--no-sandbox',
-    '--disable-setuid-sandbox'
-  ]
+      '--start-maximized',   // 启动就最大化
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ]
   });
   const context = await browser.newContext({
     viewport: null //{ width: 1440, height: 900 }

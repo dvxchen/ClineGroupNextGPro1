@@ -317,8 +317,12 @@ async function run() {
   // Open DevTools automatically if CSV mentions chrome-devtools
   const needDevtools = rows.some(r => /chrome-?devtools/i.test(r.Action || ''));
 
+  //const path = require('path');
+  const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
+  const headlessFlag = data.HEADLESS;
+
   const browser = await puppeteer.launch({
-    headless: false, // so you can see the actions
+    headless: headlessFlag, // so you can see the actions
     devtools: false, // 禁用右侧DevTools调试栏
     defaultViewport: null,
     args: needDevtools
