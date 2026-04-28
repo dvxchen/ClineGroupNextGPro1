@@ -15,11 +15,7 @@ if %errorlevel% neq 0 (
 
 REM Run the daily test runner
 
-git stash
-git pull
-
-cd ..
-node main.js
+node backup.js
 
 
 echo.
