@@ -27,9 +27,13 @@ async function writeLog(entry) {
   await resetLog();
 
   try {
+    
+const data = require(path.join(__dirname, '..', '..','Utilities', 'Settings.json'));
+const headlessFlag = data.HEADLESS;
+
     // Launch Chrome with DevTools open as per "with chrome-devtools"
     browser = await puppeteer.launch({
-      headless: false,
+      headless: headlessFlag,
       devtools: false, // 禁用右侧DevTools调试栏
       args: [
     '--start-maximized',   // 启动就最大化
