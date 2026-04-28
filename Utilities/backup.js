@@ -17,45 +17,41 @@ const now = new Date();
 const year = now.getFullYear();
 const month = String(now.getMonth() + 1).padStart(2, '0');
 const day = String(now.getDate()).padStart(2, '0');
-const dateStr = `${year}${month}${day}`; // 格式：20251219
+const dateStr = `${year}${month}${day}`; // format：20251219
 
-// ========== 2. 保存到 Windows AppData 目录 ==========
-const appData = process.env.APPDATA; // 自动获取 Windows AppData 路径
-const backupDir = path.join(appData, 'ClineBackup'); // 创建子文件夹
+// ========== 2. Save to Windows AppData  ==========
+const appData = process.env.APPDATA; // Get Windows AppData
+const backupDir = path.join(appData, 'ClineBackup'); // Create sub folder
 const outputZip = path.join(backupDir, `backup_parent_${dateStr}.zip`);
 
-// 如果备份目录不存在，自动创建
+//if not exist create one
 if (!fs.existsSync(backupDir)) {
   fs.mkdirSync(backupDir, { recursive: true });
 }
 
 
 
-// 输出的 ZIP 文件名
-//const outputZip = `backup_${dateStr}.zip`;
-// =================================================================
-
-// 开始打包
+// start
 const zip = new AdmZip();
 
 try {
   for (const item of backupList) {
     const fullPath = path.resolve(item);
 
-    // 如果是目录 → 整个目录加入
+    // if is dir, add
     if (fs.existsSync(fullPath) && fs.lstatSync(fullPath).isDirectory()) {
       zip.addLocalFolder(fullPath, path.basename(fullPath));
     }
-    // 如果是文件 → 单独加入
+    // if is file add
     else {
       zip.addLocalFile(fullPath);
     }
   }
 
-  // 输出 ZIP
+  // export
   zip.writeZip(outputZip);
-  console.log('✅ 备份成功：', outputZip);
+  console.log('✅ Success：', outputZip);
 
 } catch (err) {
-  console.error('❌ 备份失败：', err);
+  console.error('❌ Failed：', err);
 }
