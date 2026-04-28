@@ -27,19 +27,19 @@ async function writeLog(entry) {
   await resetLog();
 
   try {
-    
-const data = require(path.join(__dirname, '..', '..','Utilities', 'Settings.json'));
-const headlessFlag = data.HEADLESS;
+    const path = require('path');
+    const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
+    const headlessFlag = data.HEADLESS;
 
     // Launch Chrome with DevTools open as per "with chrome-devtools"
     browser = await puppeteer.launch({
       headless: headlessFlag,
       devtools: false, // 禁用右侧DevTools调试栏
       args: [
-    '--start-maximized',   // 启动就最大化
-    '--no-sandbox',
-    '--disable-setuid-sandbox'
-  ]
+        '--start-maximized',   // 启动就最大化
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ]
     });
 
     const page = await browser.newPage();
@@ -61,7 +61,7 @@ const headlessFlag = data.HEADLESS;
     await page.keyboard.press('Enter');
 
     // Wait for results/navigation
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
+    await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => { });
     await page.waitForSelector('#b_results', { visible: true });
     await writeLog({ step: 2, action: 'input', selector: '#sb_form_q', value: TEST_INPUT, status: 'success' });
 
@@ -84,7 +84,7 @@ const headlessFlag = data.HEADLESS;
     process.exitCode = 1;
   } finally {
     if (browser) {
-      try { await browser.close(); } catch (_) {}
+      try { await browser.close(); } catch (_) { }
     }
   }
 })();

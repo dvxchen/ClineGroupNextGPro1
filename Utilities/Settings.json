@@ -1,7 +1,8 @@
 {
-    "SHOW_LOG": "failed",
-    "SHOW_LOG_ALL": "all,simple,failed",
-    "EMAIL_TO": "davy.chen+1@sap.com",
+    "BASE_URL": "",
+    "EMAIL_TO": "davy.chen@sap.com",
     "EMAIL_ENABLE": "false",
-    "SCHEDULE": "21:00"
+    "SCHEDULE": "21:00",
+    "Enabled": "true",
+    "HEADLESS": "true"
 }
