@@ -172,6 +172,10 @@ showLog = data.SHOW_LOG;
               final = '❌ (Failed) --------------------------------------'
               FailedNumber = FailedNumber + 1;
             }
+            if (dataJson.indexOf("error") !== -1) {
+              final = '❌ (Failed) --------------------------------------'
+              FailedNumber = FailedNumber + 1;
+            }
             // user1 = [];
             const newItem = {
               id: 'T',
@@ -299,7 +303,7 @@ showLog = data.SHOW_LOG;
       }
 
       title = logData?.find(item => item.id === 'X').title;
-
+console.log('Result:' + title)
 
 
       const logDtataStr = JSON.stringify(logData, null, 2);
@@ -344,14 +348,14 @@ showLog = data.SHOW_LOG;
         const systemTempDir1 = os.tmpdir();
         const myAppDir1 = path.join(systemTempDir1, 'MyApp', 'Logs');
         const filePath1 = path.join(myAppDir1, 'merged-logs.html');
+        console.log('Output Folder: ' + filePath1 );
+
         //targetDir = myAppDir;
         await fs.mkdir(myAppDir1, { recursive: true });
 
         // fs1.writeFileSync(filePath, JSON.stringify(allLogs_all, null, 2));
         fs1.writeFileSync(filePath1, foldableJsonHtml, 'utf8');
-        //   console.log('JSON 日志合并完成');
-
-
+        
         // send email
         if (data.EMAIL_ENABLE === "true") {
           await runFile(path.join(__dirname, 'Utilities', 'email.js'));
