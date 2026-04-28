@@ -9,6 +9,7 @@ const backupList = [
   '../Cases',
   
   // 单个文件
+   '../main.js',
   '../README.md',
   '../package.json',
   '../package-lock.json'

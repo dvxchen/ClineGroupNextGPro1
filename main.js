@@ -161,21 +161,27 @@ showLog = data.SHOW_LOG;
             await fs2.remove(fileLocation);
 
             let final = [];
-            final = '✅ (Success) ---------------------------------------'
-            SuccessNumber = SuccessNumber + 1;
+            let sameFile = 0 ;
             //搜索是否有failed的， 给个总体成功或失败
-            if (dataJson.indexOf("faild") !== -1) {
+
+            if (dataJson.indexOf("faild") !== -1 ||
+                dataJson.indexOf("not_found") !== -1||
+                dataJson.indexOf("failed") !== -1 ||
+                dataJson.indexOf("error") !== -1){
+              sameFile = 1;
               final = '❌ (Failed) --------------------------------------'
               FailedNumber = FailedNumber + 1;
             }
-            if (dataJson.indexOf("not_found") !== -1) {
-              final = '❌ (Failed) --------------------------------------'
-              FailedNumber = FailedNumber + 1;
+           else{
+
+            if (sameFile === 0) {
+             final = '✅ (Success) ---------------------------------------'
+             SuccessNumber = SuccessNumber + 1;
             }
-            if (dataJson.indexOf("error") !== -1) {
-              final = '❌ (Failed) --------------------------------------'
-              FailedNumber = FailedNumber + 1;
-            }
+
+           }
+
+
             // user1 = [];
             const newItem = {
               id: 'T',
