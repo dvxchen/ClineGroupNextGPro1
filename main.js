@@ -292,31 +292,43 @@ console.log('Result:' + title)
       let foldableJsonHtml = '';
 
 
+// 转义函数，防止HTML破坏，但正常显示引号
+function escapeHtml(str) {
+  if (str === undefined || str === null) return '';
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+    // 注意：我们不转义双引号，让它正常显示 "
+}
 
-      logData.forEach(item => {
-        if (!('children' in item)) {
+logData.forEach(item => {
+  const hasChildren = item.children && 
+    (Array.isArray(item.children) ? item.children.length > 0 : typeof item.children === 'object');
 
-          foldableJsonHtml += `
+  // 格式化 JSON（正常显示 "）
+  const title = JSON.stringify(item.title, null, 2);
+  const children = hasChildren ? JSON.stringify(item.children, null, 2) : '';
+
+  if (!hasChildren) {
+    // 没有 children：不显示箭头
+    foldableJsonHtml += `
+<div style="margin:8px 0; padding:6px; border:1px solid #eee; border-radius:4px;">
+  ${escapeHtml(title)}
+</div>
+`;
+  } else {
+    // 有 children：显示折叠箭头
+    foldableJsonHtml += `
 <div>
-  <details style="margin:8px 0;">
-    <summary>${JSON.stringify(item.title, null, 2)}</summary>
-    <pre></pre>
+  <details style="margin:8px 0; border:1px solid #eee; padding:6px; border-radius:4px;">
+    <summary style="cursor:pointer; margin:0;">${escapeHtml(title)}</summary>
+    <pre style="background:#f8f8f8; padding:10px; border-radius:4px; overflow:auto;">${escapeHtml(children)}</pre>
   </details>
 </div>
 `;
-        } else {
-
-          foldableJsonHtml += `
-<div>
-  <details style="margin:8px 0;">
-    <summary>${JSON.stringify(item.title, null, 2)}</summary>
-    <pre>${JSON.stringify(item.children, null, 2)}</pre>
-  </details>
-</div>
-`;
-        }
-      }),
-
+  }
+});
 
 
 
