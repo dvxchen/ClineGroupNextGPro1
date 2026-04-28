@@ -327,12 +327,7 @@ showLog = data.SHOW_LOG;
 <div>
   <details style="margin:8px 0;">
     <summary>${JSON.stringify(item.title, null, 2)}</summary>
-    <pre></pre>
-  </details>
-</div>
-<div>
-  <details style="margin:8px 0;">
-        <pre>${JSON.stringify(item.children, null, 2)}</pre>
+    <pre>${JSON.stringify(item.children, null, 2)}</pre>
   </details>
 </div>
 `;
