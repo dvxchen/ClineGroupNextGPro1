@@ -27,10 +27,15 @@ const fs = require('fs');
   const browser = await chromium.launch({
     headless: false,
     devtools: true, // 打开 DevTools，满足“chrome-devtools打开”的要求
-    slowMo: 50
+    slowMo: 50,
+    args: [
+    '--start-maximized',   // 启动就最大化
+    '--no-sandbox',
+    '--disable-setuid-sandbox'
+  ]
   });
   const context = await browser.newContext({
-    viewport: { width: 1440, height: 900 }
+    viewport: null //{ width: 1440, height: 900 }
   });
   const page = await context.newPage();
   page.setDefaultTimeout(30000);

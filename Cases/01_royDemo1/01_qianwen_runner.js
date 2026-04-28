@@ -320,9 +320,10 @@ async function run() {
   const browser = await puppeteer.launch({
     headless: false, // so you can see the actions
     devtools: needDevtools,
-    defaultViewport: { width: 1280, height: 800 },
+    defaultViewport: null,
     args: needDevtools
       ? [
+        '--start-maximized',
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--auto-open-devtools-for-tabs'

@@ -30,7 +30,12 @@ async function writeLog(entry) {
     // Launch Chrome with DevTools open as per "with chrome-devtools"
     browser = await puppeteer.launch({
       headless: false,
-      devtools: true
+      devtools: true,
+      args: [
+    '--start-maximized',   // 启动就最大化
+    '--no-sandbox',
+    '--disable-setuid-sandbox'
+  ]
     });
 
     const page = await browser.newPage();
