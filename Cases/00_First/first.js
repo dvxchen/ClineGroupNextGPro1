@@ -26,6 +26,12 @@ async function writeLog(entry) {
 
   await resetLog();
 
+  function strToBool(val) {
+    // 先转小写，兼容 True / FALSE / True
+    const s = String(val).trim().toLowerCase();
+    return s === 'true';
+  }
+
   try {
     const path = require('path');
     const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
@@ -33,7 +39,7 @@ async function writeLog(entry) {
 
     // Launch Chrome with DevTools open as per "with chrome-devtools"
     browser = await puppeteer.launch({
-      headless: headlessFlag,
+      headless: strToBool(headlessFlag),
       devtools: false, // 禁用右侧DevTools调试栏
       args: [
         '--start-maximized',   // 启动就最大化

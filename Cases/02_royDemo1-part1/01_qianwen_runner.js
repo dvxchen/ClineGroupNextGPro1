@@ -318,11 +318,17 @@ async function run() {
   const needDevtools = rows.some(r => /chrome-?devtools/i.test(r.Action || ''));
 
   //const path = require('path');
+
+  function strToBool(val) {
+    // 先转小写，兼容 True / FALSE / True
+    const s = String(val).trim().toLowerCase();
+    return s === 'true';
+  }
   const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
   const headlessFlag = data.HEADLESS;
 
   const browser = await puppeteer.launch({
-    headless: headlessFlag, // so you can see the actions
+    headless: strToBool(headlessFlag), // so you can see the actions
     devtools: false, // 禁用右侧DevTools调试栏
     defaultViewport: null,
     args: needDevtools
