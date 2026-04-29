@@ -355,12 +355,13 @@ async function run() {
   };
   process.once('SIGINT', () => { cleanup().finally(() => process.exit(130)); });
   process.once('SIGTERM', () => { cleanup().finally(() => process.exit(143)); });
-
+  let expected = [];
   try {
     for (const [i, row] of rows.entries()) {
       const action = row.Action || '';
       const data = row.Data || '';
-      const expected = row.Expected || '';
+      expected = [];
+      expected = row.Expected || '';
 
       const lower = action.toLowerCase();
 
@@ -448,7 +449,14 @@ async function run() {
             await new Promise(r => setTimeout(r, 1000));
           }
           if (res && res.value !== null && res.value !== undefined) {
-            console.log(`[Row ${i + 2}] Extracted value: ${res.value}`);
+
+            if (expected === 'data.json') {
+              const path = require('path');
+              const data = require(path.join(__dirname, 'data.json'));
+              expected = data.value;
+            }
+
+            console.log(`[Row ${i + 2}] Extracted value: ${res.raw}`);
             const expectedTrim = (expected || '').toString().trim();
             logStep({ row: i + 2, step: 'read_token_value', value: res.value, expected: expectedTrim || null });
             const expectedNum = parseFloat((expectedTrim || '').replace('%', ''));
