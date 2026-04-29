@@ -130,19 +130,33 @@ showLog = data.SHOW_LOG;
 
           }
 
+
+
           let rawdatax = [];
           try {
-            user1 = JSON.parse(dataJson);
+            // 🔥 核心修复：按行读取，每行单独解析成 JSON
+            const lines = dataJson.trim().split('\n').filter(line => line.trim() !== '');
 
-            if (!Array.isArray(user1)) {
-              user1 = [user1];
-              fs3.writeFileSync(fileLocation, JSON.stringify(user1, null, 2));
-              dataJson = fs3.readFileSync(fileLocation, 'utf-8');
-              user1 = JSON.parse(dataJson);
-              rawdatax = user1;
+            // 逐行解析
+            rawdatax = lines.map(line => {
+              try {
+                return JSON.parse(line.trim());
+              } catch (e) {
+                return null;
+              }
+            }).filter(item => item !== null); // 过滤失败的行
+
+            // 确保是数组，并写回文件
+            if (!Array.isArray(rawdatax)) {
+              rawdatax = [];
             }
 
-            await fs2.remove(fileLocation);
+          } catch (readErr) {
+            console.error(`concatenate error 1: `, readErr);
+          }
+
+          try {
+            dataJson = JSON.stringify(rawdatax, null, 2);
 
             let final = [];
             let sameFile = 0;
@@ -170,7 +184,9 @@ showLog = data.SHOW_LOG;
 
             user1.unshift(newItem);
 
-            allLogs = Array.isArray(allLogs) ? allLogs.concat(user1) : user1;
+            //  allLogs = Array.isArray(allLogs) ? allLogs.concat(user1) : user1;
+            allLogs = rawdatax;
+            allLogs = allLogs.concat(user1)
 
             const mainNode = allLogs.find(item => item.id === 'T');
             const otherNodes = allLogs.filter(item => item.id !== 'T');
