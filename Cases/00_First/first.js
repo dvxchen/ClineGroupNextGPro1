@@ -35,7 +35,12 @@ async function writeLog(entry) {
   try {
     const path = require('path');
     const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
-    const headlessFlag = data.HEADLESS;
+    let headlessFlag = data.HEADLESS;
+    const data1 = require(path.join(__dirname, 'Settings.json'));
+    if (data1.HEADLESS === "") {
+    } else {
+      headlessFlag = data1.HEADLESS;
+    }
 
     // Launch Chrome with DevTools open as per "with chrome-devtools"
     browser = await puppeteer.launch({

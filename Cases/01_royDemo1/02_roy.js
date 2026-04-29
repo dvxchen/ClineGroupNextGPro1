@@ -33,7 +33,12 @@ function strToBool(val) {
 
   const path = require('path');
   const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
-  const headlessFlag = data.HEADLESS;
+  let headlessFlag = data.HEADLESS;
+  const data1 = require(path.join(__dirname, 'Settings.json'));
+  if (data1.HEADLESS === "") {
+  } else {
+    headlessFlag = data1.HEADLESS;
+  }
 
   const browser = await chromium.launch({
     headless: strToBool(headlessFlag),

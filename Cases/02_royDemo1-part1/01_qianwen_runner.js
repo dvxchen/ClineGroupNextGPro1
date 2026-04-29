@@ -325,7 +325,12 @@ async function run() {
     return s === 'true';
   }
   const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
-  const headlessFlag = data.HEADLESS;
+  let headlessFlag = data.HEADLESS;
+  const data1 = require(path.join(__dirname, 'Settings.json'));
+  if (data1.HEADLESS === "") {
+  } else {
+    headlessFlag = data1.HEADLESS;
+  }
 
   const browser = await puppeteer.launch({
     headless: strToBool(headlessFlag), // so you can see the actions

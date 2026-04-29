@@ -21,7 +21,7 @@ function runFile(path) {
     });
     child.on('close', (code) => {
       if (code === 0) resolve();
-      else reject(new Error(`js${path}run failed`));
+      else reject(new Error(`js ${path} run failed`));
     });
   });
 }
