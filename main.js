@@ -10,9 +10,9 @@ const fs3 = require('fs');
 const os = require('os');
 
 const { spawn } = require('child_process');
-const glob = require('glob'); // 需安装: npm install glob
+const glob = require('glob'); // need install: npm install glob
 
-// 封装：等待单个js执行完毕
+//wait each js finish
 function runFile(path) {
   return new Promise((resolve, reject) => {
     const child = spawn('node', [path], {
@@ -21,7 +21,7 @@ function runFile(path) {
     });
     child.on('close', (code) => {
       if (code === 0) resolve();
-      else reject(new Error(`文件${path}执行失败`));
+      else reject(new Error(`js${path}run failed`));
     });
   });
 }
@@ -54,11 +54,10 @@ showLog = data.SHOW_LOG;
           continue
         }
 
-
         const files = await fs.readdir(dirPath);
         const jsFiles = files.filter(file => file.endsWith('.js'));
 
-        // 使用 for...of 循环
+
         for (const file of jsFiles) {
 
           if (file.indexOf(".json") !== -1) {
@@ -91,7 +90,6 @@ showLog = data.SHOW_LOG;
             await fs2.remove(fileCPath);
             await fs2.remove(fileRootPath);
             await fs2.remove(fileUPath);
-            //  console.log('清理完成（clear if exist or not）');
 
           } catch (err) {
             console.error('remove log file error:', err);
@@ -99,7 +97,6 @@ showLog = data.SHOW_LOG;
 
           try {
             await runFile(dirPath1 + '\\' + file);
-            //   await runFile('node', [dirPath1 + '\\' + file])
           } catch (err) {
             console.error('run  js error:', err);
           }
@@ -111,24 +108,18 @@ showLog = data.SHOW_LOG;
           try { // find log.json file 
             dataJson = fs3.readFileSync(fileCPath, 'utf-8');
             fileLocation = fileCPath
-            //console.log('读取内容:', dataJson);
           } catch (err) {
             if (err.code === 'ENOENT') {
-              // console.log('文件不存在当前目录');
               try {
                 dataJson = fs3.readFileSync(filePPath, 'utf-8');
                 fileLocation = filePPath
-                //console.log('读取内容:', dataJson);
               } catch (err) {
                 if (err.code === 'ENOENT') {
-                  //   console.log('文件不存在Cases根目录');
                   try {
                     dataJson = fs3.readFileSync(fileRootPath, 'utf-8');
                     fileLocation = fileRootPath
-                    //console.log('读取内容:', dataJson);
                   } catch (err) {
                     if (err.code === 'ENOENT') {
-                      //     console.log('文件不存在根目录');
                     }
 
                   }
@@ -144,45 +135,33 @@ showLog = data.SHOW_LOG;
             user1 = JSON.parse(dataJson);
 
             if (!Array.isArray(user1)) {
-              //  console.log('检测到文件不是数组，正在转换为数组格式...');
-              // 如果原文件是对象，把它包在数组里；如果是空的，创建空数组
               user1 = [user1];
-
               fs3.writeFileSync(fileLocation, JSON.stringify(user1, null, 2));
-              //     console.log('✅ 成功写入！');
               dataJson = fs3.readFileSync(fileLocation, 'utf-8');
-              //     console.log('✅ 再次读出！');
               user1 = JSON.parse(dataJson);
               rawdatax = user1;
             }
 
-
-            //删除log.json
             await fs2.remove(fileLocation);
 
             let final = [];
-            let sameFile = 0 ;
-            //搜索是否有failed的， 给个总体成功或失败
+            let sameFile = 0;
 
             if (dataJson.indexOf("faild") !== -1 ||
-                dataJson.indexOf("not_found") !== -1||
-                dataJson.indexOf("failed") !== -1 ||
-                dataJson.indexOf("error") !== -1){
+              dataJson.indexOf("not_found") !== -1 ||
+              dataJson.indexOf("failed") !== -1 ||
+              dataJson.indexOf("error") !== -1) {
               sameFile = 1;
               final = '❌ (Failed) --------------------------------------'
               FailedNumber = FailedNumber + 1;
             }
-           else{
-
-            if (sameFile === 0) {
-             final = '✅ (Success) ---------------------------------------'
-             SuccessNumber = SuccessNumber + 1;
+            else {
+              if (sameFile === 0) {
+                final = '✅ (Success) ---------------------------------------'
+                SuccessNumber = SuccessNumber + 1;
+              }
             }
 
-           }
-
-
-            // user1 = [];
             const newItem = {
               id: 'T',
               title: final + caseName,
@@ -191,33 +170,22 @@ showLog = data.SHOW_LOG;
 
             user1.unshift(newItem);
 
-            // 头部追加
-            //   user1 = user1.unshift(newItem);
             allLogs = Array.isArray(allLogs) ? allLogs.concat(user1) : user1;
-            //  allLogs = allLogs.concat(user1);
 
             const mainNode = allLogs.find(item => item.id === 'T');
-            // 找到所有非 T 节点
             const otherNodes = allLogs.filter(item => item.id !== 'T');
 
-            // 把非 T 节点全部放到 mainNode 的 children 里
             mainNode.children = otherNodes;
-            //     console.log(JSON.stringify(mainNode, null, 2));
             allLogs = mainNode;
 
-            //合并
-            //   allLogs_all = Array.isArray(allLogs) ? allLogs.concat(allLogs) : allLogs;
             allLogs_all.push(allLogs);
 
           } catch (readErr) {
             console.error(`concatenate error 1: `, readErr);
           }
 
-
         }
       }
-
-      //      const allLogs1 = allLogs
 
       if (FailedNumber > 0) {
         icon = '❌ -:( '
@@ -231,21 +199,11 @@ showLog = data.SHOW_LOG;
         title: icon + 'Total: (' + TotalNumber + ") " + 'Success:(' + SuccessNumber + ') Failed: (' + FailedNumber + ')',
         time: new Date().toISOString()
       };
-      // 头部追加
       user1 = [];
       user1.unshift(newNumber);
       allLogs_all = allLogs_all.concat(user1);
 
-      //   const row = allLogs?.find(item => item.id === 'X');
-
       user1 = [];
-
-      /*——
-      allLogs = [...new Map(
-        allLogs.map(item => [item.title, item])
-      ).values()];
-*/
-
 
       let target = [];
       try { //write log.json to merged-logs.json
@@ -257,13 +215,10 @@ showLog = data.SHOW_LOG;
         await fs.mkdir(myAppDir, { recursive: true });
 
         fs1.writeFileSync(filePath, JSON.stringify(allLogs_all, null, 2));
-        //   console.log('JSON 日志合并完成');
       } catch (err) {
         console.error('cancatenate error 2:', err);
       }
 
-
-      // const rawData1 = fs.readFileSync(logFilePath, 'utf8');
       logData = allLogs_all;
 
       const data = require(path.join(__dirname, 'Utilities', 'Settings.json'));
@@ -278,7 +233,6 @@ showLog = data.SHOW_LOG;
         });
       }
 
-
       if (showLog === 'failed') {
         logData.forEach(item => {
           if (item.id === 'T' && item.title.indexOf("Success") !== -1) {
@@ -288,44 +242,38 @@ showLog = data.SHOW_LOG;
       }
 
       title = logData?.find(item => item.id === 'X').title;
-console.log('Result:' + title)
-
+      console.log('Result:' + title)
 
       const logDtataStr = JSON.stringify(logData, null, 2);
       formatJson = JSON.stringify(logData, null, 2);
 
-
       let foldableJsonHtml = '';
 
+      function escapeHtml(str) {
+        if (str === undefined || str === null) return '';
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
 
-// 转义函数，防止HTML破坏，但正常显示引号
-function escapeHtml(str) {
-  if (str === undefined || str === null) return '';
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-    // 注意：我们不转义双引号，让它正常显示 "
-}
+      logData.forEach(item => {
+        const hasChildren = item.children &&
+          (Array.isArray(item.children) ? item.children.length > 0 : typeof item.children === 'object');
 
-logData.forEach(item => {
-  const hasChildren = item.children && 
-    (Array.isArray(item.children) ? item.children.length > 0 : typeof item.children === 'object');
+        const title = JSON.stringify(item.title, null, 2);
+        const children = hasChildren ? JSON.stringify(item.children, null, 2) : '';
 
-  // 格式化 JSON（正常显示 "）
-  const title = JSON.stringify(item.title, null, 2);
-  const children = hasChildren ? JSON.stringify(item.children, null, 2) : '';
+        if (!hasChildren) {
 
-  if (!hasChildren) {
-    // 没有 children：不显示箭头
-    foldableJsonHtml += `
+          foldableJsonHtml += `
 <div style="margin:8px 0; padding:6px; border:1px solid #eee; border-radius:4px;">
   ${escapeHtml(title)}
 </div>
 `;
-  } else {
-    // 有 children：显示折叠箭头
-    foldableJsonHtml += `
+        } else {
+          // children： show arr
+          foldableJsonHtml += `
 <div>
   <details style="margin:8px 0; border:1px solid #eee; padding:6px; border-radius:4px;">
     <summary style="cursor:pointer; margin:0;">${escapeHtml(title)}</summary>
@@ -333,26 +281,26 @@ logData.forEach(item => {
   </details>
 </div>
 `;
-  }
-});
+        }
+      });
 
 
 
-        console.log('');
+      console.log('');
 
       try { //write html to merged-logs.html
 
         const systemTempDir1 = os.tmpdir();
         const myAppDir1 = path.join(systemTempDir1, 'MyApp', 'Logs');
         const filePath1 = path.join(myAppDir1, 'merged-logs_1.html');
-        console.log('Output Folder: ' + filePath1 );
+        console.log('Output Folder: ' + filePath1);
 
         //targetDir = myAppDir;
         await fs.mkdir(myAppDir1, { recursive: true });
 
         // fs1.writeFileSync(filePath, JSON.stringify(allLogs_all, null, 2));
         fs1.writeFileSync(filePath1, foldableJsonHtml, 'utf8');
-        
+
         // send email
         if (data.EMAIL_ENABLE === "true") {
           await runFile(path.join(__dirname, 'Utilities', 'email.js'));
@@ -372,8 +320,6 @@ logData.forEach(item => {
       } catch (err) {
         console.error('cancatenate error:', err);
       }
-
-
 
     } catch (err) {
       console.error('unknown error:', err);
