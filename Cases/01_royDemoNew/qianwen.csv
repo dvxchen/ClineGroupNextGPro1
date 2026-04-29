@@ -1,0 +1,5 @@
+Action,Data,Expected Result
+用Chrome打开http://www.qianwen.com,,
+在输入区输入 Return value field of JSON format. Provide the United States CPI (All items) year-over-year percentage for Mar. Use keys: value
+回车
+读取 class='token' 含有":"值的下一个class='token' 的值转换成Json格式 存盘到 data.json,,
