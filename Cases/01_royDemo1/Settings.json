@@ -1,7 +1,4 @@
 {
-    "BASE_URL": "",
-    "EMAIL_TO": "davy.chen@sap.com",
-    "EMAIL_ENABLE": "true",
-    "SCHEDULE": "21:00",
-    "Enabled": "false"
+    "Enabled": "true",
+    "HEADLESS": ""
 }

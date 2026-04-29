@@ -23,14 +23,30 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 
+function strToBool(val) {
+  // 先转小写，兼容 True / FALSE / True
+  const s = String(val).trim().toLowerCase();
+  return s === 'true';
+}
+
 (async () => {
+
+  const path = require('path');
+  const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
+  const headlessFlag = data.HEADLESS;
+
   const browser = await chromium.launch({
-    headless: false,
-    devtools: true, // 打开 DevTools，满足“chrome-devtools打开”的要求
-    slowMo: 50
+    headless: strToBool(headlessFlag),
+    devtools: false, // 
+    slowMo: 50,
+    args: [
+      '--start-maximized',   // 启动就最大化
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ]
   });
   const context = await browser.newContext({
-    viewport: { width: 1440, height: 900 }
+    viewport: null //{ width: 1440, height: 900 }
   });
   const page = await context.newPage();
   page.setDefaultTimeout(30000);
@@ -289,7 +305,7 @@ const fs = require('fs');
      */
       //将结果从 data.json 读出
 
-      //   console.log(__dirname);
+      //    console.log(__dirname);
       const path = require('path');
       const parentDir = path.join(__dirname, '..');
       const dataPath = path.join(__dirname, 'data.json');
@@ -297,7 +313,7 @@ const fs = require('fs');
       let jsonStr = null;
       try {
         const data = require(dataPath);
-        jsonStr = data && data.value;
+        jsonStr = data && data.value.toFixed(2) + '%';
         // 记录来自 data.json 的期望值
         logNote({ expectedFromDataJson: jsonStr });
       } catch (e) {

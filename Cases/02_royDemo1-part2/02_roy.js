@@ -313,7 +313,7 @@ function strToBool(val) {
       let jsonStr = null;
       try {
         const data = require(dataPath);
-        jsonStr = data && data.value;
+        jsonStr = data && data.value.toFixed(2) + '%';
         // 记录来自 data.json 的期望值
         logNote({ expectedFromDataJson: jsonStr });
       } catch (e) {

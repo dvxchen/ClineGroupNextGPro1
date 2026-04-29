@@ -317,8 +317,18 @@ async function run() {
   // Open DevTools automatically if CSV mentions chrome-devtools
   const needDevtools = rows.some(r => /chrome-?devtools/i.test(r.Action || ''));
 
+  //const path = require('path');
+
+  function strToBool(val) {
+    // 先转小写，兼容 True / FALSE / True
+    const s = String(val).trim().toLowerCase();
+    return s === 'true';
+  }
+  const data = require(path.join(__dirname, '..', '..', 'Utilities', 'Settings.json'));
+  const headlessFlag = data.HEADLESS;
+
   const browser = await puppeteer.launch({
-    headless: false, // so you can see the actions
+    headless: strToBool(headlessFlag), // so you can see the actions
     devtools: false, // 禁用右侧DevTools调试栏
     defaultViewport: null,
     args: needDevtools
@@ -345,12 +355,13 @@ async function run() {
   };
   process.once('SIGINT', () => { cleanup().finally(() => process.exit(130)); });
   process.once('SIGTERM', () => { cleanup().finally(() => process.exit(143)); });
-
+  let expected = [];
   try {
     for (const [i, row] of rows.entries()) {
       const action = row.Action || '';
       const data = row.Data || '';
-      const expected = row.Expected || '';
+      expected = [];
+      expected = row.Expected || '';
 
       const lower = action.toLowerCase();
 
@@ -438,7 +449,10 @@ async function run() {
             await new Promise(r => setTimeout(r, 1000));
           }
           if (res && res.value !== null && res.value !== undefined) {
-            console.log(`[Row ${i + 2}] Extracted value: ${res.value}`);
+            const filePath1 = path.join(__dirname, 'data.json');
+            fs.writeFileSync(filePath1, JSON.stringify(res, null, 2), 'utf8');
+            console.log(`Data export to data.json`)
+            console.log(`[Row ${i + 2}] Extracted value: ${res.raw}`);
             const expectedTrim = (expected || '').toString().trim();
             logStep({ row: i + 2, step: 'read_token_value', value: res.value, expected: expectedTrim || null });
             const expectedNum = parseFloat((expectedTrim || '').replace('%', ''));

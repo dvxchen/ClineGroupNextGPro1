@@ -449,13 +449,9 @@ async function run() {
             await new Promise(r => setTimeout(r, 1000));
           }
           if (res && res.value !== null && res.value !== undefined) {
-
-            if (expected === 'data.json') {
-              const path = require('path');
-              const data = require(path.join(__dirname, 'data.json'));
-              expected = data.value;
-            }
-
+            const filePath1 = path.join(__dirname, 'data.json');
+            fs.writeFileSync(filePath1, JSON.stringify(res, null, 2), 'utf8');
+            console.log(`Data export to data.json`)
             console.log(`[Row ${i + 2}] Extracted value: ${res.raw}`);
             const expectedTrim = (expected || '').toString().trim();
             logStep({ row: i + 2, step: 'read_token_value', value: res.value, expected: expectedTrim || null });
