@@ -4,5 +4,5 @@
     "EMAIL_TO": "davy.chen+1@sap.com",
     "EMAIL_ENABLE": "false",
     "SCHEDULE": "22:30",
-    "HEADLESS": "false"
+    "HEADLESS": "true"
 }
