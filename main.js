@@ -136,26 +136,23 @@ function addSummary() {
         SuccessNumber = SuccessNumber + 1;
       }
     }
-    user1 = [];
+    const newItemObj = [];
     const newItem = {
       id: 'T',
       title: final + caseName,
       time: new Date().toISOString()
     };
 
-    user1.unshift(newItem);
+    newItemObj.unshift(newItem);
 
-    //  allLogs = Array.isArray(allLogs) ? allLogs.concat(user1) : user1;
     allLogs = rawdatax;
-    allLogs = allLogs.concat(user1)
+    allLogs = allLogs.concat(newItemObj)
 
     const mainNode = allLogs.find(item => item.id === 'T');
     const otherNodes = allLogs.filter(item => item.id !== 'T');
 
     mainNode.children = otherNodes;
     allLogs = mainNode;
-
-
 
   } catch (readErr) {
     console.error(`concatenate error 1: `, readErr);
@@ -282,20 +279,19 @@ function makeFinalResult(SuccessNumber, FailedNumber) {
   }
   //⚠️
   const TotalNumber = SuccessNumber + FailedNumber
-  const newNumber = {
+  const titleFinal = {
     id: 'X',
     title: icon + 'Total: (' + TotalNumber + ") " + 'Success:(' + SuccessNumber + ') Failed: (' + FailedNumber + ')',
     time: new Date().toISOString()
   };
-  user1 = [];
-  user1.unshift(newNumber);
-  return user1;
+  const titleFinalObj = [];
+  titleFinalObj.unshift(titleFinal);
+  return titleFinalObj;
 }
 
 
 let allLogs = [];
 let caseName = [];
-let user1 = [];
 let SuccessNumber = 0;
 let FailedNumber = 0;
 let showLog = [];
@@ -324,7 +320,8 @@ let settingsData = [];
         caseName = jsFile;
         removeLogFiles(caseFolder)
         try {
-          await runFile(caseFolderFullPath + '\\' + jsFile);
+          const exePathFull = path.join(caseFolderFullPath, jsFile);
+          await runFile(exePathFull);
         } catch (err) {
           console.error('run  js error:', err);
         }
@@ -339,14 +336,15 @@ let settingsData = [];
         allLogs_all.push(allLogs);
       }
     }
-    user1 = makeFinalResult(SuccessNumber, FailedNumber)
-    allLogs_all = allLogs_all.concat(user1);
+    const finalResult = makeFinalResult(SuccessNumber, FailedNumber)
+    allLogs_all = allLogs_all.concat(finalResult);
     writeToMergedJson()
     foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
     writeToMergedHTML(foldableJsonHtml)
 
     if (settingsData.EMAIL_ENABLE === "true") {
       await runFile(path.join(__dirname, 'Utilities', 'email.js'));
+      process.exit();
     }
 
   } catch (err) {
