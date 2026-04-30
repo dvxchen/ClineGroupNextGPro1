@@ -33,18 +33,6 @@ async function removeLogFiles(caseFolderName) {
   }
 }
 
-function getFullPathofJSFile(fullPath, jsFileName, caseFolderName) {
-  try {  // read .js in current folder
-    const filePath = path.join(fullPath, jsFileName);
-    //   const content = await fs.readFile(filePath, 'utf8');
-    //console.log(`js content read ok: ${file}`);
-  } catch (err) {
-    console.error('read js file error:', err);
-  }
-  const dirPath1 = path.join(__dirname, 'Cases', caseFolderName, '\\');
-  return dirPath1;
-}
-
 //wait each js finish
 function runFile(path) {
   return new Promise((resolve, reject) => {
@@ -189,8 +177,7 @@ async function writeToMergedJson() {
 }
 
 function generateHtmlbySHOW_LOG(logData) {
-  const data = require(path.join(__dirname, 'Utilities', 'Settings.json'));
-  showLog = data.SHOW_LOG;
+  showLog = settingsData.SHOW_LOG;
 
   if (showLog === 'simple') {
 
@@ -265,26 +252,22 @@ async function writeToMergedHTML() {
     //targetDir = myAppDir;
     await fs.mkdir(myAppDir1, { recursive: true });
 
-    // fs1.writeFileSync(filePath, JSON.stringify(allLogs_all, null, 2));
     fs1.writeFileSync(filePath1, foldableJsonHtml, 'utf8');
 
     // send email
-    if (data.EMAIL_ENABLE === "true") {
+    if (settingsData.EMAIL_ENABLE === "true") {
       await runFile(path.join(__dirname, 'Utilities', 'email.js'));
     }
-
     const dirPath2 = path.join(__dirname);
     const files2 = await fs.readdir(dirPath2);
     const pngFiles = files2.filter(file => file.endsWith('.png'));
-    for (const file0 of pngFiles) {
-      const fileLocation1 = path.join(__dirname, file0);
-      const filePath1 = path.join(targetDir, file0);
+    for (const pngfile of pngFiles) {
+      const fileLocation1 = path.join(__dirname, pngFile);
+      const filePath1 = path.join(targetDir, pngFile);
       if (fs0.existsSync(fileLocation1)) {
         await fs2.rename(fileLocation1, filePath1);
       }
     }
-
-
 
   } catch (err) {
     console.error('cancatenate error:', err);
@@ -318,41 +301,40 @@ let FailedNumber = 0;
 let showLog = [];
 let allLogs_all = [];
 
-const data = require(path.join(__dirname, 'Utilities', 'Settings.json'));
-showLog = data.SHOW_LOG;
-
+let settingsData = [];
 
 (async () => {
   try {
-    const dirPath0 = path.join(__dirname, 'Cases');
-    const files0 = await fs.readdir(dirPath0);
-    for (const file0 of files0) {
-      const dirPath = path.join(__dirname, 'Cases', file0);
-      const fileCPath = path.join(__dirname, 'Cases', file0, 'log.json');
-      const data1 = require(path.join(dirPath, 'Settings.json'));
-      if (data1.Enabled === "true") {
+    const settingsData = require(path.join(__dirname, 'Utilities', 'Settings.json'));
+
+    const casesRootPath = path.join(__dirname, 'Cases');
+    const casesSubFolders = await fs.readdir(casesRootPath);
+    for (const caseFolder of casesSubFolders) {
+      const caseFolderFullPath = path.join(__dirname, 'Cases', caseFolder);
+      const logFilePath = path.join(__dirname, 'Cases', caseFolder, 'log.json');
+      const settingsDataLocal = require(path.join(caseFolderFullPath, 'Settings.json'));
+      if (settingsDataLocal.Enabled === "true") {
       } else {
         continue
       }
-      const files = await fs.readdir(dirPath);
+      const files = await fs.readdir(caseFolderFullPath);
       const jsFiles = files.filter(file => file.endsWith('.js'));
-      for (const file of jsFiles) {
-        if (file.indexOf(".json") !== -1) {
+      for (const jsFile of jsFiles) {
+        if (jsFile.indexOf(".json") !== -1) {
           continue
         }
-        caseName = file;
-        removeLogFiles(file0)
+        caseName = jsFile;
+        removeLogFiles(caseFolder)
         try {
-          const dirPath1 = getFullPathofJSFile(dirPath, file, file0)
-          await runFile(dirPath1 + '\\' + file);
+          await runFile(caseFolderFullPath + '\\' + jsFile);
         } catch (err) {
           console.error('run  js error:', err);
         }
         let dataJson = [];
         let fileLocation = [];
-        fileLocation = findLogJsonLocation(file0)
+        fileLocation = findLogJsonLocation(caseFolder)
         dataJson = fs3.readFileSync(fileLocation, 'utf-8');
-        removeLogFiles(file0)
+        removeLogFiles(caseFolder)
         let rawdatax = [];
         rawdatax = adjustJsonContent(dataJson);
         allLogs = addSummary(rawdatax)
@@ -365,8 +347,7 @@ showLog = data.SHOW_LOG;
     foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
     writeToMergedHTML(foldableJsonHtml)
 
-    const data2 = require(path.join(__dirname, 'Utilities', 'Settings.json'));
-    if (data2.EMAIL_ENABLE === "true") {
+    if (settingsData.EMAIL_ENABLE === "true") {
       await runFile(path.join(__dirname, 'Utilities', 'email.js'));
     }
 
