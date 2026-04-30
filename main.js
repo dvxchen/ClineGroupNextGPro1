@@ -364,6 +364,12 @@ showLog = data.SHOW_LOG;
     writeToMergedJson()
     foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
     writeToMergedHTML(foldableJsonHtml)
+
+    const data2 = require(path.join(__dirname, 'Utilities', 'Settings.json'));
+    if (data2.EMAIL_ENABLE === "true") {
+      await runFile(path.join(__dirname, 'Utilities', 'email.js'));
+    }
+
   } catch (err) {
     console.error('unknown error:', err);
   }
