@@ -135,20 +135,29 @@ showLog = data.SHOW_LOG;
           let rawdatax = [];
           try {
             // 🔥 核心修复：按行读取，每行单独解析成 JSON
-            const lines = dataJson.trim().split('\n').filter(line => line.trim() !== '');
+            //        const lines = dataJson.trim().split('\n').filter(line => line.trim() !== '');
+            const lines1 = dataJson.split('\n').map(l => l.trim()).filter(Boolean);
 
-            // 逐行解析
-            rawdatax = lines.map(line => {
-              try {
-                return JSON.parse(line.trim());
-              } catch (e) {
-                return null;
-              }
-            }).filter(item => item !== null); // 过滤失败的行
+            const isJsonLines = dataJson.split('\n').some(line => {
+              const trimmed = line.trim();
+              return trimmed.startsWith('{') && trimmed.endsWith('}');
+            }) && dataJson.split('\n').length > 1;
 
-            // 确保是数组，并写回文件
-            if (!Array.isArray(rawdatax)) {
-              rawdatax = [];
+
+            if (isJsonLines) {
+              console.log("is JSON Lines format");
+              rawdatax = dataJson
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean)
+                .map(JSON.parse);
+
+            } else {
+              console.log("is JSON format");
+              rawdatax = lines1;
+              const fullJsonStr = rawdatax.join('');
+              const parsedArray = JSON.parse(fullJsonStr);
+              rawdatax = parsedArray;
             }
 
           } catch (readErr) {
@@ -175,7 +184,7 @@ showLog = data.SHOW_LOG;
                 SuccessNumber = SuccessNumber + 1;
               }
             }
-
+            user1 = [];
             const newItem = {
               id: 'T',
               title: final + caseName,
