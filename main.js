@@ -115,7 +115,8 @@ function adjustJsonContent(dataJson) {
   return rawdatax;
 
 }
-function addSummary() {
+function addSummary(rawdatax, caseName) {
+
   try {
     dataJson = JSON.stringify(rawdatax, null, 2);
 
@@ -159,6 +160,7 @@ function addSummary() {
   }
   return allLogs
 }
+
 async function writeToMergedJson() {
   try { //write log.json to merged-logs.json
     const systemTempDir = os.tmpdir();
@@ -174,9 +176,8 @@ async function writeToMergedJson() {
 }
 
 function generateHtmlbySHOW_LOG(logData) {
-  showLog = settingsData.SHOW_LOG;
 
-  if (showLog === 'simple') {
+  if (settingsData.SHOW_LOG === 'simple') {
 
     logData.forEach(item => {
       if (item.id === 'T') {
@@ -185,7 +186,7 @@ function generateHtmlbySHOW_LOG(logData) {
     });
   }
 
-  if (showLog === 'failed') {
+  if (settingsData.SHOW_LOG === 'failed') {
     logData.forEach(item => {
       if (item.id === 'T' && item.title.indexOf("Success") !== -1) {
         delete item.children;
@@ -289,12 +290,9 @@ function makeFinalResult(SuccessNumber, FailedNumber) {
   return titleFinalObj;
 }
 
-
-let allLogs = [];
-let caseName = [];
 let SuccessNumber = 0;
 let FailedNumber = 0;
-let showLog = [];
+//let allLogs = [];
 let allLogs_all = [];
 let settingsData = [];
 
@@ -317,7 +315,6 @@ let settingsData = [];
         if (jsFile.indexOf(".json") !== -1) {
           continue
         }
-        caseName = jsFile;
         removeLogFiles(caseFolder)
         try {
           const exePathFull = path.join(caseFolderFullPath, jsFile);
@@ -325,15 +322,11 @@ let settingsData = [];
         } catch (err) {
           console.error('run  js error:', err);
         }
-        let dataJson = [];
-        let fileLocation = [];
-        fileLocation = findLogJsonLocation(caseFolder)
-        dataJson = fs3.readFileSync(fileLocation, 'utf-8');
+        const fileLocation = findLogJsonLocation(caseFolder)
+        const dataJson = fs3.readFileSync(fileLocation, 'utf-8');
         removeLogFiles(caseFolder)
-        let rawdatax = [];
-        rawdatax = adjustJsonContent(dataJson);
-        allLogs = addSummary(rawdatax)
-        allLogs_all.push(allLogs);
+        const rawdatax = adjustJsonContent(dataJson);
+        allLogs_all.push(addSummary(rawdatax, jsFile));
       }
     }
     const finalResult = makeFinalResult(SuccessNumber, FailedNumber)
