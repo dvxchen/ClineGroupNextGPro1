@@ -304,7 +304,7 @@ let settingsData = [];
 
 (async () => {
   try {
-    const settingsData = require(path.join(__dirname, 'Utilities', 'Settings.json'));
+    settingsData = require(path.join(__dirname, 'Utilities', 'Settings.json'));
 
     const casesRootPath = path.join(__dirname, 'Cases');
     const casesSubFolders = await fs.readdir(casesRootPath);
