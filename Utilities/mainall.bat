@@ -15,6 +15,7 @@ if %errorlevel% neq 0 (
 
 REM Run the daily test runner
 
+node removeLogFiles.js
 node backup.js
 
 git pull

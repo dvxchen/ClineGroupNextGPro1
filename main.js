@@ -94,7 +94,7 @@ function adjustJsonContent(dataJson) {
 
 
     if (isJsonLines) {
-      console.log("is JSON Lines format");
+      //console.log("is JSON Lines format");
       rawdatax = dataJson
         .split('\n')
         .map(line => line.trim())
@@ -102,7 +102,7 @@ function adjustJsonContent(dataJson) {
         .map(JSON.parse);
 
     } else {
-      console.log("is JSON format");
+      //console.log("is JSON format");
       rawdatax = lines1;
       const fullJsonStr = rawdatax.join('');
       const parsedArray = JSON.parse(fullJsonStr);
