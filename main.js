@@ -127,7 +127,7 @@ function adjustJsonContent(dataJson) {
   return rawdatax;
 
 }
-function addSummary(rawdatax, caseName) {
+function addSummary() {
   try {
     dataJson = JSON.stringify(rawdatax, null, 2);
 
@@ -254,7 +254,7 @@ function generateHtmlbySHOW_LOG(logData) {
 
   return foldableJsonHtml;
 }
-async function writeToMergedHTML(foldableJsonHtml) {
+async function writeToMergedHTML() {
   try { //write html to merged-logs.html
 
     const systemTempDir1 = os.tmpdir();
@@ -284,11 +284,12 @@ async function writeToMergedHTML(foldableJsonHtml) {
       }
     }
 
+
+
   } catch (err) {
     console.error('cancatenate error:', err);
   }
 }
-
 function makeFinalResult(SuccessNumber, FailedNumber) {
 
   if (FailedNumber > 0) {
@@ -308,6 +309,7 @@ function makeFinalResult(SuccessNumber, FailedNumber) {
   return user1;
 }
 
+
 let allLogs = [];
 let caseName = [];
 let user1 = [];
@@ -322,58 +324,49 @@ showLog = data.SHOW_LOG;
 
 (async () => {
   try {
-
     const dirPath0 = path.join(__dirname, 'Cases');
     const files0 = await fs.readdir(dirPath0);
-    try {
-      for (const file0 of files0) {
-        const dirPath = path.join(__dirname, 'Cases', file0);
-        const fileCPath = path.join(__dirname, 'Cases', file0, 'log.json');
-        const data1 = require(path.join(dirPath, 'Settings.json'));
-
-        if (data1.Enabled === "true") {
-        } else {
+    for (const file0 of files0) {
+      const dirPath = path.join(__dirname, 'Cases', file0);
+      const fileCPath = path.join(__dirname, 'Cases', file0, 'log.json');
+      const data1 = require(path.join(dirPath, 'Settings.json'));
+      if (data1.Enabled === "true") {
+      } else {
+        continue
+      }
+      const files = await fs.readdir(dirPath);
+      const jsFiles = files.filter(file => file.endsWith('.js'));
+      for (const file of jsFiles) {
+        if (file.indexOf(".json") !== -1) {
           continue
         }
-
-        const files = await fs.readdir(dirPath);
-        const jsFiles = files.filter(file => file.endsWith('.js'));
-
-        for (const file of jsFiles) {
-
-          if (file.indexOf(".json") !== -1) {
-            continue
-          }
-
-          removeLogFiles(file0)
-
-          try {
-            const dirPath1 = getFullPathofJSFile(dirPath, file, file0)
-            await runFile(dirPath1 + '\\' + file);
-          } catch (err) {
-            console.error('run  js error:', err);
-          }
-
-          fileLocation = findLogJsonLocation(file0)
-          dataJson = fs3.readFileSync(fileLocation, 'utf-8');
-          removeLogFiles(file0)
-          rawdatax = adjustJsonContent(dataJson);
-          allLogs = addSummary(rawdatax, file)
-          allLogs_all.push(allLogs);
-
+        caseName = file;
+        removeLogFiles(file0)
+        try {
+          const dirPath1 = getFullPathofJSFile(dirPath, file, file0)
+          await runFile(dirPath1 + '\\' + file);
+        } catch (err) {
+          console.error('run  js error:', err);
         }
+        let dataJson = [];
+        let fileLocation = [];
+        fileLocation = findLogJsonLocation(file0)
+        dataJson = fs3.readFileSync(fileLocation, 'utf-8');
+        removeLogFiles(file0)
+        let rawdatax = [];
+        rawdatax = adjustJsonContent(dataJson);
+        allLogs = addSummary(rawdatax)
+        allLogs_all.push(allLogs);
       }
-
-      user1 = makeFinalResult(SuccessNumber, FailedNumber)
-      allLogs_all = allLogs_all.concat(user1);
-      writeToMergedJson()
-      foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
-      writeToMergedHTML(foldableJsonHtml)
-
-    } catch (err) {
-      console.error('unknown error:', err);
     }
+    user1 = makeFinalResult(SuccessNumber, FailedNumber)
+    allLogs_all = allLogs_all.concat(user1);
+    writeToMergedJson()
+    foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
+    writeToMergedHTML(foldableJsonHtml)
   } catch (err) {
     console.error('unknown error:', err);
   }
 })();
+
+
