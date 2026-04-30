@@ -300,7 +300,6 @@ let SuccessNumber = 0;
 let FailedNumber = 0;
 let showLog = [];
 let allLogs_all = [];
-
 let settingsData = [];
 
 (async () => {
@@ -311,7 +310,6 @@ let settingsData = [];
     const casesSubFolders = await fs.readdir(casesRootPath);
     for (const caseFolder of casesSubFolders) {
       const caseFolderFullPath = path.join(__dirname, 'Cases', caseFolder);
-      const logFilePath = path.join(__dirname, 'Cases', caseFolder, 'log.json');
       const settingsDataLocal = require(path.join(caseFolderFullPath, 'Settings.json'));
       if (settingsDataLocal.Enabled === "true") {
       } else {
