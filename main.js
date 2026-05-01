@@ -305,7 +305,7 @@ let settingsData = [];
     for (const caseFolder of casesSubFolders) {
       const caseFolderFullPath = path.join(__dirname, 'Cases', caseFolder);
       const settingsDataLocal = require(path.join(caseFolderFullPath, 'Settings.json'));
-      if (settingsDataLocal.Enabled === "true") {
+      if (settingsDataLocal.Enabled === "true" || settingsDataLocal.Enabled === true) {
       } else {
         continue
       }
@@ -335,7 +335,7 @@ let settingsData = [];
     foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
     writeToMergedHTML(foldableJsonHtml)
 
-    if (settingsData.EMAIL_ENABLE === "true") {
+    if (settingsData.EMAIL_ENABLE === "true" || settingsDataLocal.EMAIL_ENABLE === true) {
       await runFile(path.join(__dirname, 'Utilities', 'email.js'));
       process.exit();
     }
