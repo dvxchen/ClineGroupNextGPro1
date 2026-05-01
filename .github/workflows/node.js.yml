@@ -1,0 +1,25 @@
+name: Node.js CI
+
+on:
+  workflow_dispatch:  # 手动触发
+  push:
+    branches: [ main ]  # 推送到 main 时自动跑
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x  # 用 Node 20
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run your Node program
+        run: node main.js  # 这里改成你的入口文件
