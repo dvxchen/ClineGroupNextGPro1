@@ -1,10 +1,4 @@
 {
-<<<<<<< HEAD
-    "Enabled": "false",
-    "HEADLESS": "true"
-}
-=======
     "Enabled": "true",
     "HEADLESS": "true"
 }
->>>>>>> d699a87a0b2f324f45e2605e66dd02babc68a48e
