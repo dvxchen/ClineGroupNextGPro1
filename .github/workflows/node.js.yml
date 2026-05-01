@@ -1,10 +1,8 @@
-name: Node.js CI
+name: Run Node.js with Playwright
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:  # 手动触发（推荐）
   push:
-    branches: [ main ]  # 推送到 main 时自动跑
-  pull_request:
     branches: [ main ]
 
 jobs:
@@ -12,15 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Use Node.js
+
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x  # 用 Node 20
-          
+          node-version: 20.x
+
       - name: Install dependencies
         run: npm install
-        
-      - name: Run your Node program
-        run: npx playwright install  
-             node main.js  # 这里改成你的入口文件
+
+      # 👇 这一步必须单独写，安装 Playwright 浏览器
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # 👇 再运行你的代码
+      - name: Run main.js
+        run: node main.js
