@@ -1,31 +1,47 @@
-name: Playwright Test
-
+name: Run Node.js with Puppeteer
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
-
-    container:
-      image: mcr.microsoft.com/playwright:v1.45.0-jammy
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.x
 
       - name: Install dependencies
         run: npm install
 
-      # 不需要再运行 npx playwright install！
-      # 镜像自带所有浏览器
+      # 👇 安装 Puppeteer 必需的 Chrome 浏览器
+      - name: Install Puppeteer Chrome
+        run: npx puppeteer browsers install chrome
 
-      - name: Run your script
+      # 👇 安装系统依赖（必须！否则Chrome打不开）
+      - name: Install system dependencies for Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxrandr2 \
+            libgbm1 \
+            libpango-1.0-0 \
+            libcairo2 \
+            libasound2 \
+            libx11-xcb1
+
+      # 👇 运行你的代码
+      - name: Run main.js
         run: node main.js
