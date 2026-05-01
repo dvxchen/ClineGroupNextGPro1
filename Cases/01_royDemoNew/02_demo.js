@@ -10,7 +10,7 @@
  * 4) 点击 第一个 .sapMLnkText 的 link
  * 5) 点击 "FX Forecast Agent"
  * 6) 点击 TAB: "Interest Rate Differentials"
- * 7) 读取 United States 行的 CPI 字段值，取 % 符号前面的部分，与 Windows AppData\Roaming\data.json 中的 value 字段比较
+ * 7) 读取 United States 行的 CPI 字段值，取 % 符号前面的部分，与 操作系统临时目录(Temp) 中的 data.json 的 字段比较（兼容 Windows/macOS/Linux）
  *
  * Prerequisites to run:
  *   npm i -D playwright
@@ -278,15 +278,15 @@ async function getTableCellValue(page, rowLabel, columnHeaderLabel) {
         console.log('[INFO] CPI(United States) from page:', actualCpi);
         logEvent('info', 7, 'read_cpi', { row: 'United States', column: 'CPI', value: actualCpi });
 
-        // Load expected value from Windows AppData Roaming\data.json
-        const roamingDir = process.env.APPDATA || path.join(process.env.USERPROFILE || require('os').homedir(), 'AppData', 'Roaming');
-        const appDataPath = path.join(roamingDir, 'data.json');
-        if (!fs.existsSync(appDataPath)) {
-            throw new Error(`Expected file not found: ${appDataPath}`);
+        // Load expected value from OS temporary directory: data.json (cross-platform: Windows/macOS/Linux)
+        const tempDir = require('os').tmpdir();
+        const tempDataPath = path.join(tempDir, 'data.json');
+        if (!fs.existsSync(tempDataPath)) {
+            throw new Error(`Expected file not found: ${tempDataPath}`);
         }
-        const expectedRaw = JSON.parse(fs.readFileSync(appDataPath, 'utf-8')).value;
-        console.log('[INFO] Expected value from', appDataPath, ':', expectedRaw);
-        logEvent('info', 8, 'load_expected', { path: appDataPath, value: expectedRaw });
+        const expectedRaw = JSON.parse(fs.readFileSync(tempDataPath, 'utf-8')).value;
+        console.log('[INFO] Expected value from', tempDataPath, ':', expectedRaw);
+        logEvent('info', 8, 'load_expected', { path: tempDataPath, value: expectedRaw });
 
         // Compare using value before '%' (numeric if possible, otherwise strict string)
         const actualBeforePercent = String(actualCpi).split('%')[0];
