@@ -1,4 +1,4 @@
-name: Run Node.js with Playwright
+name: Playwright Test
 
 on:
   workflow_dispatch:
@@ -6,24 +6,26 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+
+    container:
+      image: mcr.microsoft.com/playwright:v1.45.0-jammy
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
 
-      # 👇 这是 GitHub 官方支持 playwright 的唯一正确写法（解决权限！）
-      - name: Install Playwright browsers
-        uses: microsoft/playwright-github-action@v1
+      # 不需要再运行 npx playwright install！
+      # 镜像自带所有浏览器
 
-      # 👇 最后运行你的代码
-      - name: Run main.js
+      - name: Run your script
         run: node main.js
