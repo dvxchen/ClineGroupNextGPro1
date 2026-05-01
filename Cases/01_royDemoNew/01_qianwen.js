@@ -7,7 +7,7 @@
  * 1) 用Chrome打开http://www.qianwen.com 让窗口最大化
  * 2) 在输入区输入 <some text>
  * 3) 回车
- * 4) 读取 class='token' 含有":"值的下一个class='token' 的值转换成Json格式 存盘到 appdata 目录的data.json
+ * 4) 读取 class='token' 含有":"值的下一个class='token' 的值转换成Json格式 存盘到 操作系统临时目录 的 data.json
  *
  * Runtime requirements:
  * - Node.js
@@ -350,7 +350,7 @@ async function main() {
                 }
                 writeLog({ level: 'info', event: 'press_enter_done' });
             }
-            // 4) 读取 class='token' 含有":"值的下一个class='token' 的值... 保存到 appdata\data.json
+            // 4) 读取 class='token' 含有":"值的下一个class='token' 的值... 保存到 OS 临时目录 data.json
             else if (/读取\s*class='token'/.test(a)) {
                 console.log('[ACTION] Extracting value from tokenized response and saving JSON (2-decimal formatting + "% (Mar)")...');
                 writeLog({ level: 'action', event: 'extract_begin' });
@@ -388,14 +388,10 @@ async function main() {
                 const formatted = num.toFixed(2);
                 const result = { value: formatted + '% (Mar)' };
 
-                const appData =
-                    process.env.APPDATA ||
-                    process.env.LOCALAPPDATA ||
-                    path.join(os.homedir(), 'AppData', 'Roaming');
-
-                const outPath = path.join(appData, 'data.json');
+                const tmpDir = os.tmpdir();
+                const outPath = path.join(tmpDir, 'data.json');
                 fs.writeFileSync(outPath, JSON.stringify(result, null, 2), 'utf-8');
-                console.log('[OK] Saved JSON to:', outPath);
+                console.log('[OK] Saved JSON to (OS temp):', outPath);
                 writeLog({ level: 'info', event: 'extract_saved', path: outPath, data: result });
             }
             // Unrecognized step
