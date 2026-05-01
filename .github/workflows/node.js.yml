@@ -1,17 +1,18 @@
 name: Run Node.js with Playwright
 
 on:
-  workflow_dispatch:  # 手动触发（推荐）
+  workflow_dispatch:
   push:
     branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
@@ -19,10 +20,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 👇 这一步必须单独写，安装 Playwright 浏览器
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+      # 👇 这是 GitHub 官方支持 playwright 的唯一正确写法（解决权限！）
+      - name: Install Playwright browsers
+        uses: microsoft/playwright-github-action@v1
 
-      # 👇 再运行你的代码
+      # 👇 最后运行你的代码
       - name: Run main.js
         run: node main.js
