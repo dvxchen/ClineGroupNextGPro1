@@ -282,7 +282,7 @@ function makeFinalResult(SuccessNumber, FailedNumber) {
   const TotalNumber = SuccessNumber + FailedNumber
   const titleFinal = {
     id: 'X',
-    title: icon + 'Total: (' + TotalNumber + ") " + 'Success:(' + SuccessNumber + ') Failed: (' + FailedNumber + ')',
+    title: ' ' + runMode + ' ' + icon + 'Total: (' + TotalNumber + ") " + 'Success:(' + SuccessNumber + ') Failed: (' + FailedNumber + ')',
     time: new Date().toISOString()
   };
   const titleFinalObj = [];
@@ -295,6 +295,7 @@ let FailedNumber = 0;
 //let allLogs = [];
 let allLogs_all = [];
 let settingsData = [];
+let RunMode = [];
 
 (async () => {
   try {
@@ -319,8 +320,9 @@ let settingsData = [];
       }
 
       if (isEmpty(email)) {
+        runMode = "Debug"
       } else {
-        if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { }
+        if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { runMode = "Auto" }
         else {
           continue
         }
