@@ -1,7 +1,22 @@
 name: Run Node.js Puppeteer
 on:
   workflow_dispatch:
+   inputs:
+      # 👇 这个 env_type 就是你问的！
+      env_type:
+        description: '运行环境'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - dev
+          - prod
 
+      # 你还可以加更多参数
+      message:
+        description: '消息'
+        required: false
+        default: 'hello'
 jobs:
   build:
     runs-on: ubuntu-22.04
