@@ -5,6 +5,9 @@ on:
       # Parameters
       EMAIL_TO:
         description: "Email To for example: (dvxchen@qq.com)"
+  schedule:
+    - cron: "0 7 * * *"  
+    
 jobs:
   build:
     runs-on: ubuntu-22.04
