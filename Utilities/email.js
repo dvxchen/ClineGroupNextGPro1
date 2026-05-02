@@ -46,7 +46,8 @@ const args = process.argv.slice(2);
 const email1 = args.join('').replace(/[\[\]]/g, '');
 
 */
-//const settingsData1 = require(path.join(__dirname, 'Utilities', 'Settings.json'));
+const path2 = require('path');
+
 
 let finalEmail = [];
 let email2 = [];
@@ -62,7 +63,8 @@ if (fs.existsSync(tempFile)) {
 
 if (email2.indexOf('.com') !== -1) { finalEmail = email2 }
 else {
-    finalEmail = 'davy.chen@sap.com'; //settingsData.EMAIL_TO;
+    const settingsData2 = require(path.join(path2.join(__dirname, 'Settings.json')));
+    finalEmail = settingsData2.EMAIL_TO;; //settingsData.EMAIL_TO;
 }
 console.log("email:", finalEmail);
 
