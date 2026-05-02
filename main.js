@@ -313,9 +313,17 @@ let settingsData = [];
       } else {
         continue
       }
-      if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { }
-      else {
-        continue
+
+      function isEmpty(str) {
+        return !str || str.trim() === '';
+      }
+
+      if (isEmpty(email)) {
+      } else {
+        if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { }
+        else {
+          continue
+        }
       }
 
       const files = await fs.readdir(caseFolderFullPath);
