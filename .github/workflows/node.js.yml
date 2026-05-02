@@ -4,10 +4,7 @@ on:
     inputs:
       # Parameters
       EMAIL_TO:
-        description: "Email To"
-        required: true
-        default: "dvxchen@qq.com"
-
+        description: "Email To for example: (dvxchen@qq.com)"
 jobs:
   build:
     runs-on: ubuntu-22.04
