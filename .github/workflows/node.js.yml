@@ -6,17 +6,11 @@ on:
       env_type:
         description: '运行环境'
         required: true
-        default: 'prod'
+        default: aaa@bbb.com'
         type: choice
         options:
-          - dev
-          - prod
+          - email
 
-      # 你还可以加更多参数
-      message:
-        description: '消息'
-        required: false
-        default: 'hello'
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -56,5 +50,6 @@ jobs:
         run: sudo npm install -g puppeteer
 
       # 👇 直接运行
+      
       - name: Run main.js
-        run: node main.js
+        run: node main.js "${{ inputs.env_type }}"
