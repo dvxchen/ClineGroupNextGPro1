@@ -13,6 +13,8 @@ let logData;
 let row;
 let title;
 
+
+
 const transporter = nodemailer.createTransport({
     host: "smtp.qq.com",
     port: 587,
@@ -40,9 +42,21 @@ const foldableJsonHtml = fs.readFileSync(filePath2, 'utf8');
 
 title = users?.find(item => item.id === 'X').title;
 
+const args = process.argv.slice(2);
+const email1 = args.join('').replace(/[\[\]]/g, '');
+let finalEmail = [];
+
+//const settingsData1 = require(path.join(__dirname, 'Utilities', 'Settings.json'));
+
+if (email1.indexOf('.com') !== -1) { finalEmail = email1 }
+else {
+    finalEmail = 'davy.chen@sap.com'; //settingsData.EMAIL_TO;
+}
+console.log("email:", finalEmail);
+
 const mailOptions = {
     from: '"Test Report for Cline Group Next G Pro" <dvxchen@qq.com>',
-    to: "davy.chen@sap.com",
+    to: finalEmail,
     subject: title,
     text: "Review Content",
     html: foldableJsonHtml,

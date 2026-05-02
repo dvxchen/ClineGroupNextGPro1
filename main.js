@@ -34,12 +34,28 @@ async function removeLogFiles(caseFolderName) {
 }
 
 //wait each js finish
+/*
 function runFile(path) {
   return new Promise((resolve, reject) => {
     const child = spawn('node', [path], {
       stdio: 'inherit',
       //  shell: true
     });
+    child.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`js ${path} run failed`));
+    });
+  });
+}
+*/
+// 正确版本：支持 path + 参数数组
+function runFile(path, args = []) {
+  return new Promise((resolve, reject) => {
+    // ✅ 正确写法：把 path 和 args 合并成一个数组
+    const child = spawn('node', [path, ...args], {
+      stdio: 'inherit',
+    });
+
     child.on('close', (code) => {
       if (code === 0) resolve();
       else reject(new Error(`js ${path} run failed`));
@@ -355,7 +371,7 @@ let RunMode = [];
     writeToMergedHTML(foldableJsonHtml)
 
     if (settingsData.EMAIL_ENABLE === "true" || settingsDataLocal.EMAIL_ENABLE === true) {
-      await runFile(path.join(__dirname, 'Utilities', 'email.js'));
+      await runFile(path.join(__dirname, 'Utilities', 'email.js'), '[' + email + ']');
       process.exit();
     }
 
