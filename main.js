@@ -372,7 +372,7 @@ let RunMode = [];
 
     if (settingsData.EMAIL_ENABLE === "true" || settingsDataLocal.EMAIL_ENABLE === true) {
       await runFile(path.join(__dirname, 'Utilities', 'email.js'), '[' + email + ']');
-      process.exit();
+      // process.exit();
     }
 
   } catch (err) {
