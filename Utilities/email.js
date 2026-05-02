@@ -13,7 +13,7 @@ let logData;
 let row;
 let title;
 
-
+let once = 0;
 
 const transporter = nodemailer.createTransport({
     host: "smtp.qq.com",
@@ -41,14 +41,26 @@ const foldableJsonHtml = fs.readFileSync(filePath2, 'utf8');
 
 
 title = users?.find(item => item.id === 'X').title;
-
+/*
 const args = process.argv.slice(2);
 const email1 = args.join('').replace(/[\[\]]/g, '');
-let finalEmail = [];
 
+*/
 //const settingsData1 = require(path.join(__dirname, 'Utilities', 'Settings.json'));
 
-if (email1.indexOf('.com') !== -1) { finalEmail = email1 }
+let finalEmail = [];
+let email2 = [];
+
+const tempFile = path.join(os.tmpdir(), 'email.txt');
+if (fs.existsSync(tempFile)) {
+    email2 = fs.readFileSync(tempFile, 'utf8').trim();
+    fs.unlinkSync(tempFile);
+
+} else {
+    process.exit();
+}
+
+if (email2.indexOf('.com') !== -1) { finalEmail = email2 }
 else {
     finalEmail = 'davy.chen@sap.com'; //settingsData.EMAIL_TO;
 }

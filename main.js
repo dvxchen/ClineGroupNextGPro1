@@ -312,7 +312,7 @@ let FailedNumber = 0;
 let allLogs_all = [];
 let settingsData = [];
 let RunMode = [];
-
+let once = 0;
 (async () => {
   try {
     const args = process.argv.slice(1);
@@ -369,12 +369,14 @@ let RunMode = [];
     writeToMergedJson()
     foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
     writeToMergedHTML(foldableJsonHtml)
-
+    let emailFinal = [];
     if (settingsData.EMAIL_ENABLE === "true" || settingsDataLocal.EMAIL_ENABLE === true) {
-      await runFile(path.join(__dirname, 'Utilities', 'email.js'), '[' + email + ']');
-      // process.exit();
+      const tempFile = path.join(os.tmpdir(), 'email.txt');
+      if (email === undefined || email === null || email.trim() === '') { emailFinal = 'Empty' }
+      else { emailFinal = email }
+      fs0.writeFileSync(tempFile, emailFinal, 'utf8');
+      await runFile(path.join(__dirname, 'Utilities', 'email.js'));
     }
-
   } catch (err) {
     console.error('unknown error:', err);
   }
