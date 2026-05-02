@@ -1,6 +1,12 @@
 name: Run Node.js Puppeteer
 on:
   workflow_dispatch:
+    inputs:
+      # Parameters
+      EMAIL_TO:
+        description: "Email To"
+        required: true
+        default: "dvxchen@qq.com"
 
 jobs:
   build:
@@ -41,5 +47,7 @@ jobs:
         run: sudo npm install -g puppeteer
 
       # 👇 直接运行
+      
       - name: Run main.js
-        run: node main.js
+        run: node main.js "${{ inputs.EMAIL_TO }}"
+
