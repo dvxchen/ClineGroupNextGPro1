@@ -131,7 +131,7 @@ function adjustJsonContent(dataJson) {
   return rawdatax;
 
 }
-function addSummary(rawdatax, caseName) {
+function addSummary(rawdatax, caseName, email) {
 
   try {
     dataJson = JSON.stringify(rawdatax, null, 2);
@@ -157,6 +157,7 @@ function addSummary(rawdatax, caseName) {
     const newItem = {
       id: 'T',
       title: final + caseName,
+      email: email,
       time: new Date().toISOString()
     };
 
@@ -361,7 +362,8 @@ let once = 0;
         const dataJson = fs3.readFileSync(fileLocation, 'utf-8');
         removeLogFiles(caseFolder)
         const rawdatax = adjustJsonContent(dataJson);
-        allLogs_all.push(addSummary(rawdatax, jsFile));
+        const settingsData2 = require(path.join(path.join(caseFolderFullPath, 'Settings.json')));
+        allLogs_all.push(addSummary(rawdatax, jsFile, settingsData2.EMAIL_TO));
       }
     }
     const finalResult = makeFinalResult(SuccessNumber, FailedNumber)
