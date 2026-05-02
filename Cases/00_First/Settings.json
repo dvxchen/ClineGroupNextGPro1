@@ -1,4 +1,6 @@
 {
+    "EMAIL_TO": "dvxchen@qq.com",
+    "EMAIL_ENABLE": true,
     "Enabled": true,
     "HEADLESS": true
 }

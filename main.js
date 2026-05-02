@@ -298,6 +298,10 @@ let settingsData = [];
 
 (async () => {
   try {
+    const args = process.argv.slice(1);
+    const email = args[1];
+    console.log("email:", email);
+
     settingsData = require(path.join(__dirname, 'Utilities', 'Settings.json'));
 
     const casesRootPath = path.join(__dirname, 'Cases');
@@ -309,6 +313,11 @@ let settingsData = [];
       } else {
         continue
       }
+      if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { }
+      else {
+        continue
+      }
+
       const files = await fs.readdir(caseFolderFullPath);
       const jsFiles = files.filter(file => file.endsWith('.js'));
       for (const jsFile of jsFiles) {

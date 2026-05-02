@@ -1,4 +1,4 @@
 {
     "Enabled": true,
-    "HEADLESS": true
+    "HEADLESS": false
 }
