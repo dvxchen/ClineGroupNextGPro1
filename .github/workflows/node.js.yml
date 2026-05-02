@@ -1,15 +1,12 @@
 name: Run Node.js Puppeteer
 on:
   workflow_dispatch:
-   inputs:
-      # 👇 这个 env_type 就是你问的！
-      env_type:
-        description: '运行环境'
+    inputs:
+      # Parameters
+      EMAIL_TO:
+        description: "Email To"
         required: true
-        default: aaa@bbb.com'
-        type: choice
-        options:
-          - email
+        default: "dvxchen@qq.com"
 
 jobs:
   build:
@@ -52,4 +49,5 @@ jobs:
       # 👇 直接运行
       
       - name: Run main.js
-        run: node main.js "${{ inputs.env_type }}"
+        run: node main.js "${{ inputs.EMAIL_TO }}"
+
