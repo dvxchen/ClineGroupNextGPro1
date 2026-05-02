@@ -320,9 +320,9 @@ let RunMode = [];
       }
 
       if (isEmpty(email)) {
-        runMode = "Debug"
+        runMode = "Auto"
       } else {
-        if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { runMode = "Auto" }
+        if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { runMode = "Debug" }
         else {
           continue
         }
