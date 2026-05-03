@@ -453,7 +453,6 @@ let finalResult = [];
         for (const JSFile of JSFiles) {
           index = index + 1;
           const caseFolder = path.dirname(JSFile);
-          caseFolderPub = caseFolder;
           const caseFolderBase = path.basename(caseFolder);
           removeLogFiles(caseFolderBase)
           try {
@@ -470,6 +469,7 @@ let finalResult = [];
           allLogs_all.push(addSummary(rawdatax, path.basename(JSFile)));
           if (index === 1) {
             settingsData3 = require(path.join(path.join(caseFolder, 'Settings.json')));
+            caseFolderPub = caseFolder;
           }
           if (JSFiles.length === index) {
             finalResult = makeFinalResult(SuccessNumber, FailedNumber, settingsData2.EMAIL_TO, RunMode);
