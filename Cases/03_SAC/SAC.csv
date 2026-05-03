@@ -1,5 +1,0 @@
-Action,Data,Expected Result
-用chrome-devtools打开https://master-integration-t01.master.canary.eu10.projectorca.cloud,,
-输入email: davy.chen@sap.com
-输入password: Abcd1234
-点击log on按钮,,

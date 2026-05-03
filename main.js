@@ -131,7 +131,7 @@ function adjustJsonContent(dataJson) {
   return rawdatax;
 
 }
-function addSummary(rawdatax, caseName, email) {
+function addSummary(rawdatax, caseName) {
 
   try {
     dataJson = JSON.stringify(rawdatax, null, 2);
@@ -157,7 +157,6 @@ function addSummary(rawdatax, caseName, email) {
     const newItem = {
       id: 'T',
       title: final + caseName,
-      email: email,
       time: new Date().toISOString()
     };
 
@@ -288,7 +287,7 @@ async function writeToMergedHTML() {
     console.error('cancatenate error:', err);
   }
 }
-function makeFinalResult(SuccessNumber, FailedNumber) {
+function makeFinalResult(SuccessNumber, FailedNumber, email, RunMode) {
 
   if (FailedNumber > 0) {
     icon = '❌ -:( '
@@ -299,7 +298,8 @@ function makeFinalResult(SuccessNumber, FailedNumber) {
   const TotalNumber = SuccessNumber + FailedNumber
   const titleFinal = {
     id: 'X',
-    title: ' ' + runMode + ' ' + icon + 'Total: (' + TotalNumber + ") " + 'Success:(' + SuccessNumber + ') Failed: (' + FailedNumber + ')',
+    email: email,
+    title: ' ' + RunMode + ' ' + icon + 'Total: (' + TotalNumber + ") " + 'Success:(' + SuccessNumber + ') Failed: (' + FailedNumber + ')， ' + email,
     time: new Date().toISOString()
   };
   const titleFinalObj = [];
@@ -307,43 +307,19 @@ function makeFinalResult(SuccessNumber, FailedNumber) {
   return titleFinalObj;
 }
 
-let SuccessNumber = 0;
-let FailedNumber = 0;
-//let allLogs = [];
-let allLogs_all = [];
-let settingsData = [];
-let RunMode = [];
-let once = 0;
-(async () => {
-  try {
-    const args = process.argv.slice(1);
-    const email = args[1];
-    console.log("email:", email);
 
-    settingsData = require(path.join(__dirname, 'Utilities', 'Settings.json'));
+async function scanAllEmailAddress(runMode) {
+  let emailAddressArr = [];
 
-    const casesRootPath = path.join(__dirname, 'Cases');
-    const casesSubFolders = await fs.readdir(casesRootPath);
-    for (const caseFolder of casesSubFolders) {
-      const caseFolderFullPath = path.join(__dirname, 'Cases', caseFolder);
-      const settingsDataLocal = require(path.join(caseFolderFullPath, 'Settings.json'));
-      if (settingsDataLocal.Enabled === "true" || settingsDataLocal.Enabled === true) {
-      } else {
-        continue
-      }
+  const casesRootPath = path.join(__dirname, 'Cases');
+  const casesSubFolders = await fs.readdir(casesRootPath);
 
-      function isEmpty(str) {
-        return !str || str.trim() === '';
-      }
+  for (const caseFolder of casesSubFolders) {
+    const caseFolderFullPath = path.join(casesRootPath, caseFolder);
+    const settingsPath = path.join(caseFolderFullPath, 'Settings.json');
 
-      if (isEmpty(email)) {
-        runMode = "Auto"
-      } else {
-        if (email.indexOf(settingsDataLocal.EMAIL_TO) !== -1) { runMode = "Debug" }
-        else {
-          continue
-        }
-      }
+    try {
+
 
       const files = await fs.readdir(caseFolderFullPath);
       const jsFiles = files.filter(file => file.endsWith('.js'));
@@ -351,34 +327,224 @@ let once = 0;
         if (jsFile.indexOf(".json") !== -1) {
           continue
         }
-        removeLogFiles(caseFolder)
-        try {
-          const exePathFull = path.join(caseFolderFullPath, jsFile);
-          await runFile(exePathFull);
-        } catch (err) {
-          console.error('run  js error:', err);
+
+        // 用 fs 读取，不要用 require（会缓存！）
+        const settingsContent = await fs.readFile(settingsPath, 'utf8');
+        const settingsDataLocal = JSON.parse(settingsContent);
+
+        // 判断是否启用
+        if (settingsDataLocal.Enabled !== "true" && settingsDataLocal.Enabled !== true) {
+          continue;
         }
-        const fileLocation = findLogJsonLocation(caseFolder)
-        const dataJson = fs3.readFileSync(fileLocation, 'utf-8');
-        removeLogFiles(caseFolder)
-        const rawdatax = adjustJsonContent(dataJson);
-        const settingsData2 = require(path.join(path.join(caseFolderFullPath, 'Settings.json')));
-        allLogs_all.push(addSummary(rawdatax, jsFile, settingsData2.EMAIL_TO));
+
+        // 有邮箱就加入数组
+        const email = settingsDataLocal.EMAIL_TO;
+        if (email && email.trim()) {
+          // ✅ 正确写法：只 push，不赋值！
+          emailAddressArr.push(email.trim());
+        }
+
       }
+
+
+    } catch (err) {
+      //console.log("跳过文件夹：", caseFolder);
     }
-    const finalResult = makeFinalResult(SuccessNumber, FailedNumber)
-    allLogs_all = allLogs_all.concat(finalResult);
-    writeToMergedJson()
-    foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
-    writeToMergedHTML(foldableJsonHtml)
-    let emailFinal = [];
-    if (settingsData.EMAIL_ENABLE === "true" || settingsDataLocal.EMAIL_ENABLE === true) {
-      const tempFile = path.join(os.tmpdir(), 'email.txt');
-      if (email === undefined || email === null || email.trim() === '') { emailFinal = 'Empty' }
-      else { emailFinal = email }
-      fs0.writeFileSync(tempFile, emailFinal, 'utf8');
-      await runFile(path.join(__dirname, 'Utilities', 'email.js'));
+  }
+
+  // 去重
+  let newArr = [...new Set(emailAddressArr)];
+
+
+
+
+  return newArr;
+}
+function isEmpty(str) {
+  return !str || str.trim() === '';
+}
+
+async function readJSFiles(emailTo) {
+  let jsFiles1 = [];
+  const casesRootPath = path.join(__dirname, 'Cases');
+  const casesSubFolders = await fs.readdir(casesRootPath);
+
+  for (const caseFolder of casesSubFolders) {
+    const caseFolderFullPath = path.join(casesRootPath, caseFolder);
+    const settingsPath = path.join(caseFolderFullPath, 'Settings.json');
+
+    try {
+      // ====================== 优化 1 ======================
+      // 每个文件夹只读取一次 Settings.json，而不是每个 JS 都读一次！
+      const settingsContent = await fs.readFile(settingsPath, 'utf8');
+      const settingsDataLocal = JSON.parse(settingsContent);
+
+      // 判断是否启用
+      if (settingsDataLocal.Enabled !== "true" && settingsDataLocal.Enabled !== true) {
+        continue;
+      }
+
+      // ====================== 优化 2 ======================
+      // 读取当前文件夹下所有 .js 文件
+      const files = await fs.readdir(caseFolderFullPath);
+      const jsFiles = files.filter(file => file.endsWith('.js'));
+
+      for (const jsFile of jsFiles) {
+        const fullPath = path.join(caseFolderFullPath, jsFile);
+
+        // 匹配邮箱
+        if (emailTo === '-Auto-') {
+          jsFiles1.push(fullPath);
+        } else {
+          if (settingsDataLocal.EMAIL_TO === emailTo) {
+            jsFiles1.push(fullPath);
+          }
+        }
+      }
+
+    } catch (err) {
+      // console.log("跳过文件夹：", caseFolder);
     }
+  }
+
+  return jsFiles1;
+}
+
+let SuccessNumber = 0;
+let FailedNumber = 0;
+let allLogs = [];
+let allLogs_all = [];
+let allLogs_all_all = [];
+let settingsData = [];
+let settingsData2 = [];
+let settingsData3 = [];
+let RunMode = [];
+let once = 0;
+let settingsDataLocal = [];
+let aaa = [];
+let finalResult = [];
+(async () => {
+  try {
+    const args = process.argv.slice(1);
+    const email = args[1];
+    console.log("email:", email);
+
+    let emailArray = [];
+    let allNeeded = [];
+
+    if (!email?.trim()) {
+      // 空 → 读取全部
+      RunMode = 'Auto'
+      emailArray = await scanAllEmailAddress();
+      emailArray.push('-Auto-');
+      allNeeded = true;
+    } else {
+      RunMode = 'Debug'
+      // 有值 → 只加当前邮箱
+      emailArray.push(email.trim());
+      emailArray = [...new Set(emailArray)];
+      allNeeded = false;
+    }
+
+
+
+    for (let oneEmail of emailArray) {
+
+
+
+
+      if (oneEmail == '-Auto-') {
+
+        writeToMergedJson()
+        foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all_all)
+        writeToMergedHTML(foldableJsonHtml)
+
+        const settingsDataPub = require(path.join(path.join(__dirname, 'Utilities', 'Settings.json')));
+        if (settingsDataPub.EMAIL_ENABLE === "true" || settingsDataPub.EMAIL_ENABLE === true) {
+          const tempFile = path.join(os.tmpdir(), 'email.txt');
+          fs0.writeFileSync(tempFile, oneEmail, 'utf8');
+          await runFile(path.join(__dirname, 'Utilities', 'email.js'));
+        }
+
+
+      }
+      else {
+        const JSFiles = await readJSFiles(oneEmail)
+
+
+        let index = 0;
+
+        if (allNeeded === false) {
+          SuccessNumber = 0;
+          FailedNumber = 0;
+          allLogs = [];
+          allLogs_all = [];
+        } else {
+
+        }
+
+        for (const JSFile of JSFiles) {
+
+          index = index + 1;
+
+          const caseFolder = path.dirname(JSFile);
+          // caseFolderPub = 
+          const caseFolderBase = path.basename(caseFolder);
+          removeLogFiles(caseFolderBase)
+          try {
+            //   const exePathFull = path.join(caseFolderFullPath, jsFile);
+            await runFile(JSFile);
+          } catch (err) {
+            console.error('run  js error:', err);
+          }
+          const strResult = String(finalResult || '');
+          const fileLocation = findLogJsonLocation(caseFolderBase);
+          const dataJson = fs3.readFileSync(fileLocation, 'utf-8');
+          removeLogFiles(path.basename(caseFolder))
+          const rawdatax = adjustJsonContent(dataJson);
+          settingsData2 = require(path.join(path.join(caseFolder, 'Settings.json')));
+          allLogs_all.push(addSummary(rawdatax, path.basename(JSFile)));
+
+          if (index === 1) {
+            settingsData3 = require(path.join(path.join(caseFolder, 'Settings.json')));
+          }
+          if (JSFiles.length === index) {
+            finalResult = makeFinalResult(SuccessNumber, FailedNumber, settingsData2.EMAIL_TO, RunMode);
+            allLogs_all = allLogs_all.concat(finalResult);
+            allLogs_all_all = allLogs_all_all.concat(allLogs_all);
+          }
+        }
+
+      }
+
+      if (oneEmail !== '-Auto-') {
+        let emailFinal = [];
+
+        finalResult = [];
+
+        writeToMergedJson()
+        foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
+        writeToMergedHTML(foldableJsonHtml)
+
+        if (settingsData3.EMAIL_ENABLE === "true" || settingsData3.EMAIL_ENABLE === true) {
+          const tempFile = path.join(os.tmpdir(), 'email.txt');
+          fs0.writeFileSync(tempFile, oneEmail, 'utf8');
+          await runFile(path.join(__dirname, 'Utilities', 'email.js'));
+        }
+
+
+        allLogs_all = [];
+        SuccessNumber = 0;
+        FailedNumber = 0;
+      }
+
+    }
+
+
+
+
+
+
   } catch (err) {
     console.error('unknown error:', err);
   }
