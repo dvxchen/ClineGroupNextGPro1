@@ -1,4 +1,4 @@
-name: Run Node.js Puppeteer
+name: Run main.js with Email Address
 on:
   workflow_dispatch:
     inputs:
