@@ -1,4 +1,4 @@
-name: Run main.js with Parameters
+name: Run main.js with Email Address
 on:
   workflow_dispatch:
     inputs:
