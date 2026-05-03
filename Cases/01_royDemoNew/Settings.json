@@ -1,4 +1,6 @@
 {
+    "SHOW_LOG": "failed",
+    "SHOW_LOG_ALL": "all,simple,failed",
     "EMAIL_TO": "davy.chen@sap.com",
     "EMAIL_ENABLE": false,
     "Enabled": true,

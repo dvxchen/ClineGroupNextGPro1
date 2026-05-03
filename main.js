@@ -395,6 +395,7 @@ let allLogs_all_all = [];
 let settingsData = [];
 let settingsData2 = [];
 let settingsData3 = [];
+let caseFolderPub = [];
 let RunMode = [];
 let once = 0;
 let settingsDataLocal = [];
@@ -431,11 +432,9 @@ let finalResult = [];
         console.log('Result:' + title)
         allLogs_all_all = allLogs_all_all.concat(finalResult);
         writeToMergedJson()
+        settingsData = settingsDataPub
         foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all_all)
         writeToMergedHTML(foldableJsonHtml)
-
-
-
         if (settingsDataPub.EMAIL_ENABLE === "true" || settingsDataPub.EMAIL_ENABLE === true) {
           const tempFile = path.join(os.tmpdir(), 'email.txt');
           fs0.writeFileSync(tempFile, oneEmail, 'utf8');
@@ -454,7 +453,7 @@ let finalResult = [];
         for (const JSFile of JSFiles) {
           index = index + 1;
           const caseFolder = path.dirname(JSFile);
-          // caseFolderPub = 
+          caseFolderPub = caseFolder;
           const caseFolderBase = path.basename(caseFolder);
           removeLogFiles(caseFolderBase)
           try {
@@ -483,6 +482,7 @@ let finalResult = [];
         let emailFinal = [];
         finalResult = [];
         writeToMergedJson()
+        settingsData = require(path.join(path.join(caseFolderPub, 'Settings.json')));
         foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
         writeToMergedHTML(foldableJsonHtml)
         if (settingsData3.EMAIL_ENABLE === "true" || settingsData3.EMAIL_ENABLE === true) {
