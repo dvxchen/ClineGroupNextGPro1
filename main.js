@@ -414,7 +414,7 @@ let finalResult = [];
     if (!email?.trim()) {
       RunMode = 'Auto'
       emailArray = await scanAllEmailAddress();
-      emailArray.sort();
+      //emailArray.sort();
       emailArray.push('-Auto-');
       allNeeded = true;
     } else {
