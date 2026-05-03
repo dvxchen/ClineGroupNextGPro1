@@ -51,3 +51,11 @@ jobs:
       - name: Run main.js
         run: node main.js "${{ inputs.EMAIL_TO }}"
 
+# 👇 Upload Video, screen shot, Report
+      - name: Upload (Video, screen shot, Report）
+        uses: actions/upload-artifact@v4
+        if: always()  # success and false
+        with:
+          name: output
+          path: |
+            /tmp/MyApp/Logs/**/*
