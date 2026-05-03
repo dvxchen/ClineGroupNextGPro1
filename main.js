@@ -310,53 +310,34 @@ function makeFinalResult(SuccessNumber, FailedNumber, email, RunMode) {
 
 async function scanAllEmailAddress(runMode) {
   let emailAddressArr = [];
-
   const casesRootPath = path.join(__dirname, 'Cases');
   const casesSubFolders = await fs.readdir(casesRootPath);
-
   for (const caseFolder of casesSubFolders) {
     const caseFolderFullPath = path.join(casesRootPath, caseFolder);
     const settingsPath = path.join(caseFolderFullPath, 'Settings.json');
-
     try {
-
-
       const files = await fs.readdir(caseFolderFullPath);
       const jsFiles = files.filter(file => file.endsWith('.js'));
       for (const jsFile of jsFiles) {
         if (jsFile.indexOf(".json") !== -1) {
           continue
         }
-
-        // 用 fs 读取，不要用 require（会缓存！）
         const settingsContent = await fs.readFile(settingsPath, 'utf8');
         const settingsDataLocal = JSON.parse(settingsContent);
 
-        // 判断是否启用
         if (settingsDataLocal.Enabled !== "true" && settingsDataLocal.Enabled !== true) {
           continue;
         }
-
-        // 有邮箱就加入数组
         const email = settingsDataLocal.EMAIL_TO;
         if (email && email.trim()) {
-          // ✅ 正确写法：只 push，不赋值！
           emailAddressArr.push(email.trim());
         }
-
       }
-
-
     } catch (err) {
-      //console.log("跳过文件夹：", caseFolder);
     }
   }
 
-  // 去重
   let newArr = [...new Set(emailAddressArr)];
-
-
-
 
   return newArr;
 }
@@ -374,18 +355,13 @@ async function readJSFiles(emailTo) {
     const settingsPath = path.join(caseFolderFullPath, 'Settings.json');
 
     try {
-      // ====================== 优化 1 ======================
-      // 每个文件夹只读取一次 Settings.json，而不是每个 JS 都读一次！
       const settingsContent = await fs.readFile(settingsPath, 'utf8');
       const settingsDataLocal = JSON.parse(settingsContent);
 
-      // 判断是否启用
       if (settingsDataLocal.Enabled !== "true" && settingsDataLocal.Enabled !== true) {
         continue;
       }
 
-      // ====================== 优化 2 ======================
-      // 读取当前文件夹下所有 .js 文件
       const files = await fs.readdir(caseFolderFullPath);
       const jsFiles = files.filter(file => file.endsWith('.js'));
 
@@ -403,7 +379,6 @@ async function readJSFiles(emailTo) {
       }
 
     } catch (err) {
-      // console.log("跳过文件夹：", caseFolder);
     }
   }
 
@@ -412,6 +387,8 @@ async function readJSFiles(emailTo) {
 
 let SuccessNumber = 0;
 let FailedNumber = 0;
+let SuccessNumberAll = 0;
+let FailedNumberAll = 0;
 let allLogs = [];
 let allLogs_all = [];
 let allLogs_all_all = [];
@@ -423,6 +400,7 @@ let once = 0;
 let settingsDataLocal = [];
 let aaa = [];
 let finalResult = [];
+
 (async () => {
   try {
     const args = process.argv.slice(1);
@@ -433,66 +411,53 @@ let finalResult = [];
     let allNeeded = [];
 
     if (!email?.trim()) {
-      // 空 → 读取全部
       RunMode = 'Auto'
       emailArray = await scanAllEmailAddress();
       emailArray.push('-Auto-');
       allNeeded = true;
     } else {
       RunMode = 'Debug'
-      // 有值 → 只加当前邮箱
       emailArray.push(email.trim());
       emailArray = [...new Set(emailArray)];
       allNeeded = false;
     }
 
-
-
     for (let oneEmail of emailArray) {
 
-
-
-
       if (oneEmail == '-Auto-') {
-
+        const settingsDataPub = require(path.join(path.join(__dirname, 'Utilities', 'Settings.json')));
+        finalResult = makeFinalResult(SuccessNumberAll, FailedNumberAll, settingsDataPub.EMAIL_TO, RunMode);
+        title = finalResult?.find(item => item.id === 'X').title;
+        console.log('Result:' + title)
+        allLogs_all_all = allLogs_all_all.concat(finalResult);
         writeToMergedJson()
         foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all_all)
         writeToMergedHTML(foldableJsonHtml)
 
-        const settingsDataPub = require(path.join(path.join(__dirname, 'Utilities', 'Settings.json')));
+
+
         if (settingsDataPub.EMAIL_ENABLE === "true" || settingsDataPub.EMAIL_ENABLE === true) {
           const tempFile = path.join(os.tmpdir(), 'email.txt');
           fs0.writeFileSync(tempFile, oneEmail, 'utf8');
           await runFile(path.join(__dirname, 'Utilities', 'email.js'));
         }
-
-
       }
       else {
         const JSFiles = await readJSFiles(oneEmail)
-
-
         let index = 0;
-
         if (allNeeded === false) {
           SuccessNumber = 0;
           FailedNumber = 0;
           allLogs = [];
           allLogs_all = [];
-        } else {
-
         }
-
         for (const JSFile of JSFiles) {
-
           index = index + 1;
-
           const caseFolder = path.dirname(JSFile);
           // caseFolderPub = 
           const caseFolderBase = path.basename(caseFolder);
           removeLogFiles(caseFolderBase)
           try {
-            //   const exePathFull = path.join(caseFolderFullPath, jsFile);
             await runFile(JSFile);
           } catch (err) {
             console.error('run  js error:', err);
@@ -504,7 +469,6 @@ let finalResult = [];
           const rawdatax = adjustJsonContent(dataJson);
           settingsData2 = require(path.join(path.join(caseFolder, 'Settings.json')));
           allLogs_all.push(addSummary(rawdatax, path.basename(JSFile)));
-
           if (index === 1) {
             settingsData3 = require(path.join(path.join(caseFolder, 'Settings.json')));
           }
@@ -512,39 +476,25 @@ let finalResult = [];
             finalResult = makeFinalResult(SuccessNumber, FailedNumber, settingsData2.EMAIL_TO, RunMode);
             allLogs_all = allLogs_all.concat(finalResult);
             allLogs_all_all = allLogs_all_all.concat(allLogs_all);
+            SuccessNumberAll = SuccessNumberAll + SuccessNumber;
+            FailedNumberAll = FailedNumberAll + FailedNumber;
           }
         }
-
-      }
-
-      if (oneEmail !== '-Auto-') {
         let emailFinal = [];
-
         finalResult = [];
-
         writeToMergedJson()
         foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
         writeToMergedHTML(foldableJsonHtml)
-
         if (settingsData3.EMAIL_ENABLE === "true" || settingsData3.EMAIL_ENABLE === true) {
           const tempFile = path.join(os.tmpdir(), 'email.txt');
           fs0.writeFileSync(tempFile, oneEmail, 'utf8');
           await runFile(path.join(__dirname, 'Utilities', 'email.js'));
         }
-
-
         allLogs_all = [];
         SuccessNumber = 0;
         FailedNumber = 0;
       }
-
     }
-
-
-
-
-
-
   } catch (err) {
     console.error('unknown error:', err);
   }
