@@ -39,13 +39,8 @@ const myAppDir1 = path.join(systemTempDir1, 'MyApp', 'Logs');
 const filePath2 = path.join(myAppDir1, 'merged-logs_1.html');
 const foldableJsonHtml = fs.readFileSync(filePath2, 'utf8');
 
+title = users.filter(item => item.id === 'X').pop().title;
 
-title = users?.find(item => item.id === 'X').title;
-/*
-const args = process.argv.slice(2);
-const email1 = args.join('').replace(/[\[\]]/g, '');
-
-*/
 const path2 = require('path');
 
 
