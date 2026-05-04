@@ -177,7 +177,7 @@ function addSummary(rawdatax, caseName) {
   return allLogs
 }
 
-async function writeToMergedJson() {
+async function writeToMergedJson(allLogs_all) {
   try { //write log.json to merged-logs.json
     const systemTempDir = os.tmpdir();
     const myAppDir = path.join(systemTempDir, 'MyApp', 'Logs');
@@ -432,7 +432,7 @@ let finalResult = [];
         title = finalResult?.find(item => item.id === 'X').title;
         console.log('Result:' + title)
         allLogs_all_all = allLogs_all_all.concat(finalResult);
-        writeToMergedJson()
+        writeToMergedJson(allLogs_all_all)
         settingsData = settingsDataPub
         foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all_all)
         writeToMergedHTML(foldableJsonHtml)
@@ -482,7 +482,7 @@ let finalResult = [];
         }
         let emailFinal = [];
         finalResult = [];
-        writeToMergedJson()
+        writeToMergedJson(allLogs_all)
         settingsData = require(path.join(path.join(caseFolderPub, 'Settings.json')));
         foldableJsonHtml = generateHtmlbySHOW_LOG(allLogs_all)
         writeToMergedHTML(foldableJsonHtml)
